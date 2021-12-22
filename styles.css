@@ -1,0 +1,24 @@
+/**********************/
+/* Button cntainer */
+.block_closed_loop_support.button-container {
+    z-index: 2 !important;
+    position: relative;
+}
+
+/**********************/
+/* Button cntainer */
+.block_closed_loop_support.button-container:hover {
+    background-color: black;
+}
+
+/**********************/
+/* Button position */
+.block_closed_loop_support.button-container .loopButton {
+    position: absolute;
+    right: -18px;
+    top: 0;
+}
+
+.block_closed_loop_support.button-container .btn-success{
+    line-height: 1.2;
+}

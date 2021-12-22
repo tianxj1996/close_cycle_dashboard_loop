@@ -20,7 +20,7 @@
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
  * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later   
  */
 
 defined('MOODLE_INTERNAL') || die();
