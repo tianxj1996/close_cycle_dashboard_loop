@@ -15,19 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Block version
+ * Point of View services.
  *
- * @package    block_closed_loop_support
+ * @package    block_point_view
  * @copyright  2022 Rene Hilgemann
  * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later   
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-$pluginVersion = 2021121605;    //TODO: Modify at the end
 
-$plugin->component = 'block_closed_loop_support';
-$plugin->version   = $pluginVersion; 
-$plugin->requires  = 2021051704;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = 'v3.11-r1'; //Release for Moodle 3.11 Stable
+$functions = array(
+    'block_closed_loop_support_external' => array(
+        'classname'   => 'block_closed_loop_support_external_data',
+        'methodname'  => 'update_db',
+        'classpath'   => 'blocks/closed_loop_support/externallib.php',
+        'description' => 'Update Database due to a request.',
+        'type'        => 'write',
+        'ajax'        => true
+    ));

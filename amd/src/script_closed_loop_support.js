@@ -21,15 +21,30 @@
 
 import * as Templates from 'core/templates';
 import * as Notification from 'core/notification';
+import * as Ajax from 'core/ajax';
 
 
+const data = {
+    courseID: -1
+};
 
-const eventFunction = (e) =>{
+
+const buttonClickEvent = (e) =>{
+
+    var cmIDClicked = e.target.getAttribute('id').replace('Module-','');
     Notification.addNotification({
-       message: "Clicked: " +  e.target.getAttribute('id'),
+       message: "Clicked: " +  cmIDClicked,
        type: "info"
      });
-//alert("Clicked: " +  e.target.getAttribute('id'));
+
+     Ajax.call([{
+        methodname: 'block_closed_loop_support_external',
+        args: {courseID: data.courseID, cmID: cmIDClicked},
+        done: Notification.addNotification({message: "Erfolg", type: "success"}),
+        fail: Notification.exception
+      }]);
+
+
 };
 
 
@@ -52,13 +67,15 @@ const renderTemplate = (element, idNumber) => {
 
 /**
  * Setting up
+ * @param {Integer} courseID
  */
-export const init = () => {
+export const init = (courseID) => {
+    data.courseID = courseID;
 
     var courseWrapper = document.getElementsByClassName('course-content');
     if(courseWrapper)
     {
-        courseWrapper[0].addEventListener('click', (e) => {eventFunction(e);});
+        courseWrapper[0].addEventListener('click', (e) => {buttonClickEvent(e);});
     }
 
     for(let i = 1; i < 10; i++)

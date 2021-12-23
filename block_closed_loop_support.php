@@ -52,20 +52,21 @@ class block_closed_loop_support extends block_base{
     public function get_required_javascript() {
         parent::get_required_javascript();
 
-        //global $USER, $COURSE;
-        global $OUTPUT;
+        global $COURSE , $USER, $OUTPUT;
         if(!$this->page->user_is_editing())
         {
+            //Load course data
+            
             
              //$button = "<button id='test' class='btn btn-success'>bla</button>";
              //$this->page->requires->js_init_code('document.getElementById("maincontent")
              //                                .after(' . $button . ');');
-            //\core\notification::success("Blub");
-            /*$data = [
-                'variable' => 'Lorem ipsum',
-            ];*/
+            \core\notification::success("Blub");
+            
+
             //$buttonHtml =  $OUTPUT->render_from_template('block_closed_loop_support/loopButton', $data);
-            $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_support', 'init');
+            $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_support', 
+                    'init', [$COURSE->id]);
 
         }
 
