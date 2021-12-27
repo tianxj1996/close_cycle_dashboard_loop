@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Point of View services.
+ * Services for closed loop support
  *
  * @package    block_point_view
  * @copyright  2022 Rene Hilgemann
@@ -33,4 +33,13 @@ $functions = array(
         'description' => 'Update Database due to a request.',
         'type'        => 'write',
         'ajax'        => true
-    ));
+    ),
+    'block_closed_loop_support_external' => array(
+        'classname'   => 'block_closed_loop_support_external_data',
+        'methodname'  => 'read_requests',
+        'classpath'   => 'blocks/closed_loop_support/externallib.php',
+        'description' => 'Get all unread requests for teacher',
+        'type'        => 'read',
+        'ajax'        => true
+    )
+    );

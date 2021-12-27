@@ -42,7 +42,7 @@ class block_closed_loop_support_external_data extends external_api {
         );
     }
     
-        /**
+    /**
     * Returns a log message
     *
     * @return external_description
@@ -57,21 +57,69 @@ class block_closed_loop_support_external_data extends external_api {
         
         $table = 'block_closed_loop_support';
         $conditions = array('courseid' => $courseID, 'moduleid' => $cmID, 'userid' => $USER->id);
-        if(!$DB->record_exists($table, $conditions))
-        {
-            $dataobject = array(
-                'userid' => $USER->id,
-                'courseid' => $courseID,
-                'moduleid' => $cmID,
-                'counter' => 1
-            );
-            $newID = $DB->insert_record($table, $dataobject);
-        }
-        else
-        {
-            $actualCounter = $DB->get_field($table, 'counter', $conditions);
-            $DB->set_field($table, 'counter', $actualCounter+1, $conditions);
-        }
+        $time = new DateTime("now", core_date::get_user_timezone_object());
+        $timeStamp = $time->getTimestamp();
         
+
+        if(!$DB->record_exists($table, $conditions)){
+            $counter = 1;
+        }
+        else{
+            $counter = $DB->get_field($table, 'counter', $conditions) + 1;
+        }
+                
+        $dataobject = array(
+            'userid' => $USER->id,
+            'courseid' => $courseID,
+            'moduleid' => $cmID,
+            'counter' => $counter,
+            'timestamp' => $timeStamp
+        );
+        
+        $DB->insert_record($table, $dataobject);
     }
+    
+    
+    /**
+    * Parameters definition for read_requests
+    */
+    public static function read_requests_parameters() {
+        return new external_function_parameters(
+            array(
+                'courseid' => new external_value(PARAM_INT, 'id of course', VALUE_DEFAULT, -1)
+            )
+        );
+    }
+    
+    
+    /**
+    * read_requests
+    */
+    public static function read_requests($courseid) {
+        global $USER;
+        require_once(__DIR__ . '/locallib.php');
+        return block_closed_loop_support_get_new_requests_teacher($USER->id, $courseid);
+    }
+    
+    
+    /**
+    * Return values of read_requests
+    *
+    * @return external_multiple_structure (requests)
+    */
+    public static function read_requests_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                [
+                    'id' => new external_value(PARAM_INT, 'ID of db entry'),
+                    'courseid' => new external_value(PARAM_INT, 'Id of course'),
+                    'userid' => new external_value(PARAM_INT, 'Id of student who requested'),
+                    'moduleid' => new external_value(PARAM_INT, 'Id of requested module'),
+                    'counter' => new external_value(PARAM_INT, 'Number of request.'),
+                    'timestamp' => new external_value(PARAM_INT, 'Timestamp of request.'),
+                ]
+            )
+        );
+    }
+    
 }

@@ -40,7 +40,7 @@ const buttonClickEvent = (e) =>{
      Ajax.call([{
         methodname: 'block_closed_loop_support_external',
         args: {courseID: data.courseID, cmID: cmIDClicked},
-        done: Notification.addNotification({message: "Erfolg", type: "success"}),
+        done: Notification.addNotification({message: "Request forwarded", type: "success"}),
         fail: Notification.exception
       }]);
 

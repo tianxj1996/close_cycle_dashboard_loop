@@ -27,11 +27,30 @@ defined('MOODLE_INTERNAL') || die();
 
 class block_closed_loop_support extends block_base{
      
+
     /**
      * Block initialization
      */
     public function init() {
+        global $PAGE;
         $this->title = get_string('pluginname', 'block_closed_loop_support');
+        
+        
+
+        
+
+    }
+    
+    
+    /**
+    * Define where block should be addable 
+    *
+    * @return array
+    */
+    public function applicable_formats() {
+        return array(
+            'course-view' => true
+        );
     }
     
         /**
@@ -39,16 +58,56 @@ class block_closed_loop_support extends block_base{
      * @return Object
      */
     public function get_content() {
+        global $PAGE, $DB, $USER;
+        require_once(__DIR__ . '/locallib.php');
+        
         $this->content = new stdClass();
-        $this->content->footer = '';
-        $this->content->text = "Block Closed loop support";
+        //$this->content->footer = 'Footer';
+        $showButtonRequests = false;
+        $newRequests = false;
+        $blockText = '<div style="text-align:center">';
+        if(has_capability('block/closed_loop_support:access_requests', $this->context)){
+            //We are no student
+            $showButtonRequests = true;
+            $requests = block_closed_loop_support_get_new_requests_teacher($USER->id);
+            if(!$requests){
+                $blockText = $blockText . get_string('noRequest', 'block_closed_loop_support');
+            }
+            else if (count($requests) > 1){
+                $newRequests = true;
+                $blockText = $blockText . get_string('newRequests', 'block_closed_loop_support');
+            }
+            else
+            {
+                $newRequests = true;
+                $blockText = $blockText . get_string('newRequest', 'block_closed_loop_support');
+            }
+            $blockText = $blockText . '<br><br>';
+            
+            if($showButtonRequests){
+                if($newRequests){
+                    $blockText = $blockText . 
+                            ' <button id="Request_Info" class="btn btn-warning">Request overview</button>';
+                }
+                else{
+                    $blockText = $blockText . 
+                            '<button id="Request_Info" class="btn btn-info">Request overview</button>';
+                }
+            }
+            $blockText = $blockText . '</div>';
+            $this->content->text = $blockText;
+
+        }
+        else{
+            $this->content->text = 'You are a student!'; //TODO!
+        }
         return  $this->content;
     }
     
     /**
      * {@inheritDoc}
      * @see block_base::get_required_javascript()
-     */
+    */
     public function get_required_javascript() {
         parent::get_required_javascript();
 
@@ -61,7 +120,6 @@ class block_closed_loop_support extends block_base{
              //$button = "<button id='test' class='btn btn-success'>bla</button>";
              //$this->page->requires->js_init_code('document.getElementById("maincontent")
              //                                .after(' . $button . ');');
-            \core\notification::success("Blub");
             
 
             //$buttonHtml =  $OUTPUT->render_from_template('block_closed_loop_support/loopButton', $data);

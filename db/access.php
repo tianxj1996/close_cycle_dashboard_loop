@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_closed_loop_support', language 'en'
+ * Capabilities needed in closed loop support
  *
- * @package    block_closed_loop_support
+ * @package    block_point_view
  * @copyright  2022 Rene Hilgemann
  * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,7 +25,19 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Closed loop support';
-$string['noRequest'] = 'No current feedback requested';
-$string['newRequests'] = 'There are new requests';
-$string['newRequest'] = 'There is a new request';
+$capabilities = array(
+    /**
+     * Define who is able to check overiew of requests
+     */
+    'block/closed_loop_support:access_requests' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW
+        )
+    )
+);
