@@ -15,19 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Block version
+ * event-oberserver class 
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
  * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later   
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-$pluginVersion = 2021121611;    //TODO: Modify at the end
-
-$plugin->component = 'block_closed_loop_support';
-$plugin->version   = $pluginVersion; 
-$plugin->requires  = 2021051704;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = 'v3.11-r1'; //Release for Moodle 3.11 Stable
+class block_closed_loop_support_observer{
+    
+    public static function viewed(\block_closed_loop_support\event\course_requests_viewed $event){
+        require_once(__DIR__ . '/../locallib.php');
+        
+        block_closed_loop_support_set_requests_viewed($event->userid, $event->courseid);
+        
+    }
+}

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Services for closed loop support
+ * Events generated in closed loop support
  *
- * @package    block_point_view
+ * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
  * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,21 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = array(
-    'block_closed_loop_support_write_requests' => array(
-        'classname'   => 'block_closed_loop_support_external_data',
-        'methodname'  => 'write_requests',
-        'classpath'   => 'blocks/closed_loop_support/externallib.php',
-        'description' => 'Update Database due to a request.',
-        'type'        => 'write',
-        'ajax'        => true
-    ),
-    'block_closed_loop_support_read_requests' => array(
-        'classname'   => 'block_closed_loop_support_external_data',
-        'methodname'  => 'read_requests',
-        'classpath'   => 'blocks/closed_loop_support/externallib.php',
-        'description' => 'Get all unread requests for teacher',
-        'type'        => 'read',
-        'ajax'        => true
+$observers = array(
+    array(
+        'eventname' => '\block_closed_loop_support\event\course_requests_viewed',
+        'callback' => 'block_closed_loop_support_observer::viewed',
+        'internal' => false
     )
-    );
+);
+    

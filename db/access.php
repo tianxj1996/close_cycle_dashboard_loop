@@ -17,7 +17,7 @@
 /**
  * Capabilities needed in closed loop support
  *
- * @package    block_point_view
+ * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
  * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -39,5 +39,27 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
             'coursecreator' => CAP_ALLOW
         )
-    )
+    ),
+    'block/closed_loop_support:generate_requests' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW
+        )
+    ),
+
+    'block/closed_loop_support:addinstance' => array(
+        'riskbitmask' => RISK_SPAM | RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ),
 );

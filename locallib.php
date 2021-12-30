@@ -30,45 +30,74 @@
  * @return boolean Description
  *
 */
-function block_closed_loop_support_get_new_requests_teacher($userid = -1, $courseid = -1){
+
+defined('MOODLE_INTERNAL') || die();
+
+function block_closed_loop_support_get_new_requests_teacher(int $userid, int $courseid = -1){
     global $DB;
     
     $requests = [];
     
-    if($userid < 0){
-        return $requests;
-    }
-    
-    $tableTimestamp = 'block_closed_loop_teacher_ti';
+    $tableTimestamp = 'block_closed_loop_teacher';
     $conditions = array('userid' => $userid, 'courseid' => $courseid);
-    $coursesCap = get_user_capability_course('block/closed_loop_support:access_requests', $userid);
     
-    if(!$coursesCap){
-        return $requests;
+    if($courseid === -1){
+        
+        return $DB->get_records($tableTimestamp, ['userid' => $userid]);
     }
-    $arrcourseCapIds = [];
-    foreach ($coursesCap as $val){
-        $arrcourseCapIds[] = $val->id;
+    else{
+        return $DB->get_records($tableTimestamp, $conditions);
+    }
+}
+
+function block_closed_loop_support_set_requests_viewed(int $userid, int $courseid = -1){
+    global $DB;
+    $tableTeacher = 'block_closed_loop_teacher';
+    $conditions = array('userid' => $userid, 'courseid' => $courseid);
+    
+    
+    if($courseid === -1){
+        
+        $DB->delete_records($tableTeacher, ['userid' => $userid]);
+    }
+    else{
+        $DB->delete_records($tableTeacher, $conditions);
+    }
+}
+
+
+function block_closed_loop_support_write_request(int $userid, int $courseid, int $cmid){
+    global $DB;
+    $table = 'block_closed_loop_support';
+    $tableTeacher = 'block_closed_loop_teacher';
+    $conditions = array('courseid' => $courseid, 'moduleid' => $cmid, 'userid' => $userid);
+    $time = new DateTime("now", core_date::get_user_timezone_object());
+    $timeStamp = $time->getTimestamp();
+
+    if (!$DB->record_exists($table, $conditions)) {
+        $counter = 1;
+    } else {
+        $counter = $DB->get_field($table, 'counter', $conditions) + 1;
     }
 
-    $timestampRecordExists = $DB->record_exists($tableTimestamp, $conditions);
-    list($insql, $inparams) = $DB->get_in_or_equal($arrcourseCapIds);
-    if($timestampRecordExists === false && $courseid < 0){
-        $sql = "SELECT * FROM {block_closed_loop_support} WHERE courseid $insql";
+    $dataobject = array(
+        'userid' => $userid,
+        'courseid' => $courseid,
+        'moduleid' => $cmid,
+        'counter' => $counter,
+        'timestamp' => $timeStamp
+    );
+
+    $requestid = $DB->insert_record($table, $dataobject);
+
+    //Update unread for course-teacher
+    $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
+    $context = get_context_instance(CONTEXT_COURSE, $courseid);
+    $teachers = get_role_users($role->id, $context);
+    $data = [];
+    foreach ($teachers as $teacher) {
+        $data[] = ['courseid' => $courseid, 'requestid' => $requestid, 'userid' => $teacher->id];
     }
-    else if($timestampRecordExists)
-    {
-        $timestampData = $DB->get_record($tableTimestamp, $conditions);
-        if($courseid < 0){
-            $sql = "SELECT * FROM {block_closed_loop_support} WHERE courseid $insql AND timestamp > :timestamp";
-            $inparams [] = ['timestamp' => $timestampData->timestamp];
-        }
-        else{
-            $sql = "SELECT * FROM {block_closed_loop_support} WHERE courseid $insql AND timestamp > :timestamp AND courseid = :courseid";
-            $inparams [] = ['timestamp' => $timestampData->timestamp];
-            $inparams [] = ['courseid' => $courseid];
-        }
-    }
-    $requests = $DB->get_records_sql($sql, $inparams);
-    return $requests;
+
+    $DB->insert_records($tableTeacher, $data);
 }

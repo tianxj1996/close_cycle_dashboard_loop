@@ -32,15 +32,13 @@ const data = {
 const buttonClickEvent = (e) =>{
 
     var cmIDClicked = e.target.getAttribute('id').replace('Module-','');
-    Notification.addNotification({
-       message: "Clicked: " +  cmIDClicked,
-       type: "info"
-     });
 
      Ajax.call([{
-        methodname: 'block_closed_loop_support_external',
-        args: {courseID: data.courseID, cmID: cmIDClicked},
-        done: Notification.addNotification({message: "Request forwarded", type: "success"}),
+        methodname: 'block_closed_loop_support_write_requests',
+        args: {
+            courseid: data.courseID,
+            cmid: cmIDClicked},
+        done: Notification.addNotification({message: "Request forwarded", type: "info"}),
         fail: Notification.exception
       }]);
 

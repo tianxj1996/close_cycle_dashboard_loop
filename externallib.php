@@ -33,11 +33,11 @@ class block_closed_loop_support_external_data extends external_api {
     /**
     * Parameters definition for update_db (user not required here)
     */
-    public static function update_db_parameters() {
+    public static function write_requests_parameters() {
         return new external_function_parameters(
             array(
-                'courseID' => new external_value(PARAM_INT, 'id of course', VALUE_REQUIRED),
-                'cmID' => new external_value(PARAM_INT, 'id of course module', VALUE_REQUIRED)
+                'courseid' => new external_value(PARAM_INT, 'id of course', VALUE_REQUIRED),
+                'cmid' => new external_value(PARAM_INT, 'id of course module', VALUE_REQUIRED)
             )
         );
     }
@@ -47,36 +47,15 @@ class block_closed_loop_support_external_data extends external_api {
     *
     * @return external_description
     */
-    public static function update_db_returns() {
+    public static function write_requests_returns() {
         return new external_value(PARAM_TEXT, 'Test');
     }
     
     
-    public static function update_db(int $courseID, int $cmID){
-        global $DB, $USER;
-        
-        $table = 'block_closed_loop_support';
-        $conditions = array('courseid' => $courseID, 'moduleid' => $cmID, 'userid' => $USER->id);
-        $time = new DateTime("now", core_date::get_user_timezone_object());
-        $timeStamp = $time->getTimestamp();
-        
-
-        if(!$DB->record_exists($table, $conditions)){
-            $counter = 1;
-        }
-        else{
-            $counter = $DB->get_field($table, 'counter', $conditions) + 1;
-        }
-                
-        $dataobject = array(
-            'userid' => $USER->id,
-            'courseid' => $courseID,
-            'moduleid' => $cmID,
-            'counter' => $counter,
-            'timestamp' => $timeStamp
-        );
-        
-        $DB->insert_record($table, $dataobject);
+    public static function write_requests(int $courseid, int $cmid){
+        global $USER;
+        require_once(__DIR__ . '/locallib.php');
+        return block_closed_loop_support_write_request($USER->id, $courseid, $cmid);
     }
     
     
@@ -95,7 +74,7 @@ class block_closed_loop_support_external_data extends external_api {
     /**
     * read_requests
     */
-    public static function read_requests($courseid) {
+    public static function read_requests(int $courseid) {
         global $USER;
         require_once(__DIR__ . '/locallib.php');
         return block_closed_loop_support_get_new_requests_teacher($USER->id, $courseid);

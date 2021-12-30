@@ -29,3 +29,4 @@ $string['pluginname'] = 'Closed loop support';
 $string['noRequest'] = 'No current feedback requested';
 $string['newRequests'] = 'There are new requests';
 $string['newRequest'] = 'There is a new request';
+$string['eventcourserequestsviewed'] = 'Requests for course viewed';

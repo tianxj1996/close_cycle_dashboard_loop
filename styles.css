@@ -22,3 +22,8 @@
 .block_closed_loop_support.button-container .btn-success{
     line-height: 1.2;
 }
+
+.cell_color{
+    color: orange;
+    font-weight: bold;
+}
