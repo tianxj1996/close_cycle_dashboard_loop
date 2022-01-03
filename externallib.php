@@ -87,18 +87,14 @@ class block_closed_loop_support_external_data extends external_api {
     * @return external_multiple_structure (requests)
     */
     public static function read_requests_returns() {
-        return new external_multiple_structure(
+        return 
             new external_single_structure(
                 [
-                    'id' => new external_value(PARAM_INT, 'ID of db entry'),
-                    'courseid' => new external_value(PARAM_INT, 'Id of course'),
-                    'userid' => new external_value(PARAM_INT, 'Id of student who requested'),
-                    'moduleid' => new external_value(PARAM_INT, 'Id of requested module'),
-                    'counter' => new external_value(PARAM_INT, 'Number of request.'),
-                    'timestamp' => new external_value(PARAM_INT, 'Timestamp of request.'),
+                    'InfoText' => new external_value(PARAM_RAW, 'Output string.'),
+                    'BtnClass' => new external_value(PARAM_RAW, 'CSS class of link'),
+                    'Url' => new external_value(PARAM_RAW, 'URL for link')
                 ]
-            )
-        );
+            );
     }
     
 }

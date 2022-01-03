@@ -67,7 +67,7 @@ if (!$table->is_downloading()) {
 }
 
 $conditions = array('userid' => $USER->id, 'courseid' => $courseid);
-$unreadRequests = block_closed_loop_support_get_new_requests_teacher($USER->id, $courseid);
+$unreadRequests = block_closed_loop_support_get_new_requests_teacher_ids($USER->id, $courseid);
 foreach($unreadRequests as $unread){
     array_push($table->unreadRequests, $unread->requestid);
 }

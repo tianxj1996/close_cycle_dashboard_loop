@@ -58,7 +58,7 @@ class block_closed_loop_support extends block_base{
      * @return Object
      */
     public function get_content() {
-        global $PAGE, $DB, $USER, $COURSE, $CFG; //TODO Check if really a course!
+        global $PAGE, $DB, $USER, $COURSE, $CFG, $OUTPUT; //TODO Check if really a course!
         require_once(__DIR__ . '/locallib.php');
         
         $this->content = new stdClass();
@@ -69,37 +69,9 @@ class block_closed_loop_support extends block_base{
         
         if(has_capability('block/closed_loop_support:access_requests', $this->context)){
             //We are no student
-            $showButtonRequests = true;
-            $newRequests = false;
-            $requests = block_closed_loop_support_get_new_requests_teacher($USER->id);
-            if(!$requests){
-                $blockText .= get_string('noRequest', 'block_closed_loop_support');
-            }
-            else if (count($requests) > 1){
-                $newRequests = true;
-                $blockText .= get_string('newRequests', 'block_closed_loop_support');
-            }
-            else
-            {
-                $newRequests = true;
-                $blockText .= get_string('newRequest', 'block_closed_loop_support');
-            }
-            $blockText = $blockText . '<br><br>';
-            
-            if($showButtonRequests){
-                $bClass = 'btn-warning';
-                if($newRequests){
-                    $bClass = 'btn-warning';
-                }
-                else{
-                    $bClass = 'btn-warning';
-                }
-                $blockText .= html_writer::link(
-                            new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", array('courseid'=> $COURSE->id)),
-                            " <button id='Request_Overview_Button' class='btn $bClass'>Request overview</button>");
-            }
-            $blockText .= '</div>';
-            $this->content->text = $blockText;
+            $data = block_closed_loop_support_get_new_requests_teacher($USER->id);
+            $this->content->text = 
+                    $OUTPUT->render_from_template('block_closed_loop_support/requestLink', $data);
 
         }
         else{
@@ -116,13 +88,11 @@ class block_closed_loop_support extends block_base{
         parent::get_required_javascript();
 
         global $COURSE , $USER, $OUTPUT;
-        $modinfo = get_fast_modinfo($COURSE->id);
-        $test = $modinfo->get_used_module_names();
-        $x = current($test);
-        
+
+
         if(!$this->page->user_is_editing() && has_capability('block/closed_loop_support:access_requests', $this->context)){
-             $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_request_button_update', 
-                    'init', [$COURSE->id]);
+             $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_request_link_update', 
+                    'init');
         }
         
         if(!$this->page->user_is_editing() && has_capability('block/closed_loop_support:access_requests', $this->context))
