@@ -31,4 +31,16 @@ class block_closed_loop_support_observer{
         block_closed_loop_support_set_requests_viewed($event->userid, $event->courseid);
         
     }
+    
+    public static function module_added(\core\event\course_module_created $event){
+        require_once(__DIR__ . '/../locallib.php');
+        block_closed_loop_support_create_response($event->courseid, [$event->objectid]);
+        
+    }
+    
+    public static function module_deleted(\core\event\course_module_deleted $event){
+        require_once(__DIR__ . '/../locallib.php');
+        block_closed_loop_support_delete_response($event->courseid, [$event->objectid]);
+        
+    }
 }

@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Module to display and manage reactions and difficulty tracks on course page.
+ * Manage buttons and response for closed loop support
  * @copyright  2022 Rene Hilgemann
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -22,68 +22,94 @@
 import * as Templates from 'core/templates';
 import * as Notification from 'core/notification';
 import * as Ajax from 'core/ajax';
+import * as ModalFactory from 'core/modal_factory';
 
 
-const data = {
-    courseID: -1
+/**
+ * Ask for response and render in div element inside of block
+ * @param {Integer} courseid
+ * @param {Integer} moduleid
+ */
+const renderResponse = (courseid, moduleid) => {
+    Ajax.call([{
+        methodname: 'block_closed_loop_support_get_response_content',
+        args: {
+            courseid: courseid,
+            moduleid: moduleid},
+        done: function(responseContent) {
+                ModalFactory.create({
+                    type: ModalFactory.types.DEFAULT,
+                    title: responseContent.title,
+                    body: responseContent.content,
+                    footer: '',
+                    large: true,
+                    scrollable: false
+                })
+                .then(modal => {
+                    modal.show();
+                    return modal;
+                });
+
+            },
+        fail: Notification.exception
+      }]);
 };
 
+/**
+ * Click event
+ * @param {Var} element
+ */
+const buttonClickEvent = (element) =>{
 
-const buttonClickEvent = (e) =>{
-
-    var cmIDClicked = e.target.getAttribute('id').replace('Module-','');
-
+    var stringIDs = element.target.getAttribute('id').replace('loopButton_','');
+    var splitString = stringIDs.split('_');
      Ajax.call([{
         methodname: 'block_closed_loop_support_write_requests',
         args: {
-            courseid: data.courseID,
-            cmid: cmIDClicked},
-        done: Notification.addNotification({message: "Request forwarded", type: "info"}),
+            courseid: splitString[0],
+            cmid: splitString[1]},
+        done: function() {
+                renderResponse(splitString[0], splitString[1]);
+            },
         fail: Notification.exception
       }]);
-
-
 };
 
 
 /**
  * Insert element
  * @param {Var} element
- * @param {Integer} idNumber
+ * @param {Var} data
  */
-const renderTemplate = (element, idNumber) => {
-        var context = {
-            Text: 'Help',
-            ModulNumber: idNumber
-        };
-        context.ModulNumber = idNumber;
-        Templates.renderForPromise('block_closed_loop_support/loopButton', context)
+const renderTemplate = (element, data) => {
+
+        Templates.renderForPromise('block_closed_loop_support/loopButton', data)
                 .then(({html, js}) => {
-            Templates.prependNodeContents(element, html, js);
+            var res = Templates.prependNodeContents(element, html, js);
+            if(res !== null){
+                res[0].addEventListener('click', (e) => {buttonClickEvent(e);});
+            }
             }).catch();
+
 };
 
 /**
  * Setting up
- * @param {Integer} courseID
+ * @param {Array} requestButtons
  */
-export const init = (courseID) => {
-    data.courseID = courseID;
+export const init = (requestButtons) => {
 
-    var courseWrapper = document.getElementsByClassName('course-content');
-    if(courseWrapper)
-    {
-        courseWrapper[0].addEventListener('click', (e) => {buttonClickEvent(e);});
-    }
+    for(let i = 0; i < Object.values(requestButtons).length; i++){
+        const data = {
+            courseid: Object.values(requestButtons)[i].courseid,
+            moduleid: Object.values(requestButtons)[i].moduleid
+        };
 
-    for(let i = 1; i < 10; i++)
-    {
-        var element = document.getElementById('module-' + i);
+        var element = document.getElementById('module-' + data.moduleid);
         if(element)
         {
-            renderTemplate(element, i);
+            renderTemplate(element, data);
         }
-
     }
 
 };

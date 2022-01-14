@@ -41,5 +41,13 @@ $functions = array(
         'description' => 'Get all unread requests for teacher',
         'type'        => 'read',
         'ajax'        => true
+    ),
+    'block_closed_loop_support_get_response_content' => array(
+        'classname'   => 'block_closed_loop_support_external_data',
+        'methodname'  => 'get_response_content',
+        'classpath'   => 'blocks/closed_loop_support/externallib.php',
+        'description' => 'Get content of response for student',
+        'type'        => 'read',
+        'ajax'        => true
     )
     );

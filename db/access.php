@@ -41,11 +41,22 @@ $capabilities = array(
         )
     ),
     'block/closed_loop_support:generate_requests' => array(
-        'riskbitmask' => RISK_PERSONAL,
+        'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
-            'student' => CAP_ALLOW
+            'user' => CAP_ALLOW //TODO: only student?
+        )
+    ),
+    'block/closed_loop_support:add_response' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW
         )
     ),
 
@@ -62,4 +73,15 @@ $capabilities = array(
 
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
+    'block/closed_loop_support:myaddinstance' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+     )
 );

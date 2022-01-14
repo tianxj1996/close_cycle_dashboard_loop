@@ -49,6 +49,8 @@ class request_table extends table_sql {
         $this->define_headers($headers);
         $this->is_sortable = false;
         $this->is_collapsible = false;
+        $this->sort_default_column = 'timestamp';
+        $this->sort_default_order = SORT_DESC;
     }
 
     /**

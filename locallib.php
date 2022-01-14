@@ -136,3 +136,185 @@ function block_closed_loop_support_write_request(int $userid, int $courseid, int
 
     $DB->insert_records($tableTeacher, $data);
 }
+
+
+function block_closed_loop_support_delete_response($courseid, $moduleids = NULL){
+    global $DB;
+    $tableResponse = 'block_closed_loop_response';
+    $requestids = [];
+    if($moduleids === NULL){
+        $requestids = $DB->get_records('block_closed_loop_support', ['courseid' => $courseid]);
+        $DB->delete_records($tableResponse, ['courseid' => $courseid]);
+    }
+    else{
+        foreach ($moduleids as $moduleid){
+            $requestids = array_merge($requestids, 
+                    $DB->get_records('block_closed_loop_support', 
+                    ['courseid' => $courseid, 'moduleid' => $moduleid]));
+            $DB->delete_records($tableResponse, ['courseid' => $courseid, 'moduleid' => $moduleid]);
+        }
+
+    }
+    
+    foreach($requestids as $rid){
+        $DB->delete_records('block_closed_loop_teacher', ['requestid' => $rid]);
+        $DB->delete_records('block_closed_loop_support', ['id' => $rid]);
+    }
+}
+
+
+function block_closed_loop_support_set_response($courseid, $moduleid = -1, $value = 0){
+    global $DB;
+    $tableResponse = 'block_closed_loop_response';
+    if($moduleid === -1){
+        $DB->set_field($tableResponse, 'setresponse', $value, ['courseid' => $courseid]);
+    }
+    else{
+        $DB->set_field($tableResponse, 'setresponse', $value, ['courseid' => $courseid, 'moduleid' => $moduleid]);
+    }
+}
+
+
+function block_closed_loop_support_create_response($courseid, $moduleids = NULL, $value = 0){
+    global $DB;
+    $tableResponse = 'block_closed_loop_response';
+    $data = [];
+    if(is_null($moduleids)){
+        $res = $DB->get_records('course_modules', ['course' => $courseid]);
+        foreach($res as $r){
+            $data[] = ['courseid' => $courseid, 'moduleid' => $r->id, 'set' => $value];
+        }
+    }
+    else{
+        foreach($moduleids as $modid){
+            $data[] = ['courseid' => $courseid, 'moduleid' => $modid, 'set' => $value];
+        }
+    }
+
+    $DB->insert_records($tableResponse, $data);
+}
+
+
+function block_closed_loop_support_set_response_config($courseid, $moduleid, $formdata){
+        global $DB, $CFG;
+        $cond = ['courseid' => $courseid, 'moduleid' => $moduleid];
+        block_closed_loop_support_set_response($courseid, $moduleid, 1);
+        
+        $textCorrect = file_save_draft_area_files(
+            $formdata->config_text['itemid'],
+            context_course::instance($courseid)->id,
+            'block_closed_loop_support',
+            'content',
+            0,
+            array('subdirs' => true),
+            $formdata->config_text['text']
+        );
+
+        $formdata->config_text['text'] = $textCorrect;
+        $DB->set_field('block_closed_loop_response', 'config', base64_encode(serialize($formdata)) , $cond);
+        
+        
+}
+
+
+function block_closed_loop_support_get_response_config($courseid, $moduleid){
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+        $rec = ($DB->get_record('block_closed_loop_response', 
+                ['courseid' => $courseid, 'moduleid' => $moduleid]))->config;
+        $contentOriginal = unserialize(base64_decode($rec));
+        
+        if(!$contentOriginal){
+            return null;
+        }
+        $correctText = file_rewrite_pluginfile_urls(
+                $contentOriginal->config_text['text'],
+                'pluginfile.php',
+                context_course::instance($courseid)->id,
+                'block_closed_loop_support',
+                'content',
+                null
+        );
+        $contentOriginal->config_text['text'] = $correctText;
+        return $contentOriginal;
+}
+
+
+function block_closed_loop_support_get_response_content($courseid, $moduleid){
+        global $DB;
+        $content = block_closed_loop_support_get_response_config($courseid, $moduleid);
+        $cms = get_fast_modinfo($courseid);
+        $cm = $cms->get_cm($moduleid);
+        $cm->get_formatted_name();
+        $title = 'Response for helprequest<br>Course/Module:    ' . get_course($courseid)->fullname. 
+                '/'.$cm->get_formatted_name();
+        
+        return ['title' => $title,'content' => $content->config_text['text']];
+}
+
+
+function block_closed_loop_support_get_responselist($courseid) {
+        global $DB;
+        $dataResponse = $DB->get_records('block_closed_loop_response', 
+                ['courseid' => $courseid, 'setresponse' => 1], '', 'id, courseid, moduleid');
+        return $dataResponse;
+}
+
+
+function block_closed_loop_support_get_responselist_html($courseid) {
+        global $DB, $CFG, $OUTPUT;
+        $dataResponse = $DB->get_records('block_closed_loop_response', ['courseid' => $courseid], '', 'moduleid, setresponse');
+        $col_array = array_column($dataResponse, 'setresponse', 'moduleid');
+        $coursename = get_course($courseid)->fullname;
+        $cms = get_fast_modinfo($courseid);
+        $iconSet = $OUTPUT->pix_icon('i/valid', 'Set');
+        $iconNotSet = $OUTPUT->pix_icon('i/invalid', 'Not set');
+        
+        //TODO: more nice!
+        $output = html_writer::start_div();
+        $sectMod = [];
+        foreach ($dataResponse as $response){
+            $cm = $cms->get_cm($response->moduleid);
+            if(!$cm->get_user_visible()){
+                continue;
+            }
+            if(empty($sectMod[$cm->sectionnum])){
+                $sectMod[$cm->sectionnum] = array($response->moduleid);
+            }
+            else{
+                $sectMod[$cm->sectionnum][] = $response->moduleid;
+            } 
+        }
+        ksort($sectMod);
+        $keys = array_keys($sectMod);
+        $counter = 0;
+        $output .= html_writer::start_tag('ul', ['class' => 'scrollListUL', 'style'=>'list-style-type:none;']);
+        foreach ($sectMod as $sect){
+            $sectionItem = get_section_name($courseid, $keys[$counter]);
+            $output .= html_writer::start_tag('li'). $sectionItem;
+            $sequenceString = $DB->get_field('course_sections', 'sequence', ['course' => $courseid,'section' => $keys[$counter]]);
+            $secArrayAllMod = explode(',', $sequenceString);
+            $items = [];
+            foreach ($secArrayAllMod as $mod){
+                if(in_array($mod, $sect)){
+                    $url = new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/set_response_view.php", 
+                    ['courseid' => $courseid, 
+                        'sectionid' => $keys[$counter], 
+                        'moduleid' => $mod]);
+                    $cm = $cms->get_cm($mod);
+                    $link = html_writer::link($url, $cm->get_formatted_name());
+                    $icon = $col_array[$mod] == 1 ? $iconSet : $iconNotSet;
+                    $items[] = $link . $icon ;
+                }
+            }
+            $output .= html_writer::alist($items,['style'=>'list-style-type:none;']);
+            $output .= html_writer::end_tag('li');
+            $counter += 1;
+        }
+        $output .= html_writer::end_tag('ul');
+        $output .= html_writer::end_div();
+        return $output;
+}
+
+
+

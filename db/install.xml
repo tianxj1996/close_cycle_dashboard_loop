@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/closed_loop_support/db" VERSION="20211229" COMMENT="XMLDB file for Moodle blocks/closed_loop_support"
+<XMLDB PATH="blocks/closed_loop_support/db" VERSION="20220112" COMMENT="XMLDB file for Moodle blocks/closed_loop_support"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -32,6 +32,20 @@
         <KEY NAME="courseforeign" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
         <KEY NAME="userforeign" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="requestforeign" TYPE="foreign" FIELDS="requestid" REFTABLE="block_closed_loop_support" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_closed_loop_response" COMMENT="Response state for each module (set/unset)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="moduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="setresponse" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="config" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialized config of response (the content)"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="courseforeign" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="moduleforeign" TYPE="foreign" FIELDS="moduleid" REFTABLE="course_modules" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>

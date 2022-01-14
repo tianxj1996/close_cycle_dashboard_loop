@@ -15,11 +15,10 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_closed_loop_support/requestLink
+    @template block_closed_loop_support/addResponse
 }}
-<div id='Request_Overview_content_teacher' style='text-align:center'>
-    {{InfoText}}
-    <br><br>
-    <a href= {{Url}}><button id='Request_Overview_Link' class='btn {{BtnClass}}'>Request overview</button> </a>
+<div class='dropdown-response'>
+  <span class='responsespan'>
+    <button id= 'response_btn_{{courseid}}_{{moduleid}}' class='addResponseBtn'>Set Response</button>
+  </span>
 </div>
-

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Point of View external lib
+ * Closed loop support external lib
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
@@ -48,7 +48,7 @@ class block_closed_loop_support_external_data extends external_api {
     * @return external_description
     */
     public static function write_requests_returns() {
-        return new external_value(PARAM_TEXT, 'Test');
+        return new external_value(PARAM_TEXT, 'Placeholder');
     }
     
     
@@ -97,4 +97,42 @@ class block_closed_loop_support_external_data extends external_api {
             );
     }
     
+    /**
+    * Return title and content for get_response_content
+    *
+    * @return external_multiple_structure
+    */
+    public static function get_response_content_returns() {
+        return 
+            new external_single_structure(
+                [
+                    'title' => new external_value(PARAM_RAW, 'Request title'),
+                    'content' => new external_value(PARAM_RAW, 'Request content'),
+                ]
+            );
+    }
+    
+    
+    /**
+    * Parameters definition for get_response_content
+    *
+    * @return external_value
+    */
+    public static function get_response_content_parameters() {
+        return new external_function_parameters(
+            array(
+                'courseid' => new external_value(PARAM_INT, 'id of course', VALUE_REQUIRED),
+                'moduleid' => new external_value(PARAM_INT, 'id of course module', VALUE_REQUIRED)
+            )
+        );
+    }
+    
+    
+    /**
+    * get_response_content
+    */
+    public static function get_response_content(int $courseid, int $moduleid) {
+        require_once(__DIR__ . '/locallib.php');
+        return block_closed_loop_support_get_response_content($courseid, $moduleid);
+    }
 }

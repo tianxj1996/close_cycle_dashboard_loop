@@ -30,6 +30,16 @@ $observers = array(
         'eventname' => '\block_closed_loop_support\event\course_requests_viewed',
         'callback' => 'block_closed_loop_support_observer::viewed',
         'internal' => false
+    ),
+    array(
+        'eventname' => '\core\event\course_module_created',
+        'callback' => 'block_closed_loop_support_observer::module_added',
+        'internal' => false
+    ),
+    array(
+        'eventname' => '\core\event\course_module_deleted',
+        'callback' => 'block_closed_loop_support_observer::module_deleted',
+        'internal' => false
     )
 );
     
