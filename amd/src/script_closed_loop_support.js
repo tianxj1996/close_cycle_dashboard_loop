@@ -42,18 +42,17 @@ const renderResponse = (courseid, moduleid) => {
             moduleid: moduleid},
         done: function(responseContent) {
                 ModalFactory.create({
-                    type: ModalFactory.types.DEFAULT,
+                    type: ModalFactory.types.CANCEL,
                     title: responseContent.title,
                     body: responseContent.content,
-                    footer: '',
-                    large: true,
-                    scrollable: false
+                    large: responseContent.size,
+                    scrollable: true
                 })
                 .then(modal => {
+                    modal.setButtonText('cancel', 'Close');
                     modal.show();
                     return modal;
                 });
-
             },
         fail: Notification.exception
       }]);

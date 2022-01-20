@@ -105,6 +105,7 @@ class block_closed_loop_support_external_data extends external_api {
                 [
                     'title' => new external_value(PARAM_RAW, 'Request title'),
                     'content' => new external_value(PARAM_RAW, 'Request content'),
+                    'size' => new external_value(PARAM_BOOL, 'Dialog size (true == large)'),
                 ]
             );
     }

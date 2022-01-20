@@ -39,6 +39,12 @@ $string['defNoRespAddable'] = '<br>On course-page responses can be added here';
 $string['defMissingCapabilitys'] = '<br><b>You have not required capabilitys!</b>';
 $string['overviewHeading'] = 'Overview about requests';
 $string['wrongCourse'] = 'Course with id {$a} not found';
+$string['responseActive'] = 'Set response active';
+$string['responseActive_help'] = 'General setting if this response is active and related response button visible on course-page';
+$string['responseContent'] = 'Editor for content definition';
+$string['responseContent_help'] = 'Editor for defining of content of the response (e.g. text, pictures, links to ressources or external websites)';
+$string['responseSetSize'] = 'Define size of response dialog';
+$string['responseSetSize_help'] = 'Define the default size of the output dialog. Size only visible in the real dialog, not here.';
 
 $string['closed_loop_support:access_requests'] = 'Overview about closed loop requests';
 $string['closed_loop_support:generate_requests'] = 'Generate a closed loop request for a course-module';

@@ -62,8 +62,10 @@
             $mform->addElement('static', 'description', 'Section', get_section_name($this->courseid, $this->sectionid));
             $mform->addElement('static', 'description', 'Module', $cm->get_formatted_name());
             
+            
             $mform->addElement('advcheckbox', 'response_active', 'Response is active', 
                     'Active', array('group' => 1), array(0, 1));
+            $mform->addHelpButton('response_active', 'responseActive', 'block_closed_loop_support');
             
             $context = context_course::instance($this->courseid);
             $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $context);
@@ -75,7 +77,10 @@
              $editoroptions
              );
             $mform->setType('config_text', PARAM_RAW);
+            $mform->addHelpButton('config_text', 'responseContent', 'block_closed_loop_support');
             
+            $mform->addElement('select', 'response_size', 'Size of response dialog', array(0 => 'normal', 1 => 'big'));
+            $mform->addHelpButton('response_size', 'responseSetSize', 'block_closed_loop_support');
             $this->add_action_buttons();
         }
 }

@@ -248,7 +248,9 @@ function block_closed_loop_support_create_response($courseid, $moduleids = NULL,
 function block_closed_loop_support_set_response_config($courseid, $moduleid, $formdata){
         global $DB, $CFG;
         $cond = ['courseid' => $courseid, 'moduleid' => $moduleid];
-        block_closed_loop_support_set_response($courseid, $moduleid, 1);
+        
+        //Separat setting in table outside of config (for easier handling in list etc.)
+        block_closed_loop_support_set_response($courseid, $moduleid, $formdata->response_active);
         
         $textCorrect = file_save_draft_area_files(
             $formdata->config_text['itemid'],
@@ -305,10 +307,10 @@ function block_closed_loop_support_get_response_content($courseid, $moduleid){
         $cms = get_fast_modinfo($courseid);
         $cm = $cms->get_cm($moduleid);
         $cm->get_formatted_name();
-        $title = 'Response for helprequest<br>Course/Module:    ' . get_course($courseid)->fullname. 
+        $title = 'Response for request<br>Course/Module:    ' . get_course($courseid)->fullname. 
                 '/'.$cm->get_formatted_name();
-        
-        return ['title' => $title,'content' => $content->config_text['text']];
+        $sizeBoolean = $content->response_size == 1 ? true : false;
+        return ['title' => $title,'content' => $content->config_text['text'], 'size' => $sizeBoolean];
 }
 
 /*
