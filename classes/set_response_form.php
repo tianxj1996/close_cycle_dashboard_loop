@@ -16,11 +16,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Form for resonse setting
+ * Form for response definition
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,6 +29,13 @@
  class setresponse_form extends moodleform
 {
      
+        /**
+        * Extended Constructor
+        * @param int $courseid
+        * @param int $sectionid 
+        * @param int $moduleid 
+        * @param string $url
+        */
         function __construct($courseid, $sectionid, $moduleid, $url) {
             global $CFG;
             $this->courseid = $courseid;
@@ -36,7 +43,11 @@
             $this->moduleid = $moduleid;
             parent::__construct($url);
         }
-        //Add elements to form
+        
+        
+        /**
+        * Defining the form content
+        */
         public function definition()
         {
             global $CFG,$DB;
@@ -65,6 +76,6 @@
              );
             $mform->setType('config_text', PARAM_RAW);
             
-             $this->add_action_buttons();
+            $this->add_action_buttons();
         }
 }

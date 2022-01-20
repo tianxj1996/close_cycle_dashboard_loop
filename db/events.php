@@ -19,28 +19,43 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $observers = array(
+    
+     /**
+     * New event-type for requests viewed
+     */
     array(
         'eventname' => '\block_closed_loop_support\event\course_requests_viewed',
         'callback' => 'block_closed_loop_support_observer::viewed',
         'internal' => false
     ),
+    
+     /**
+     * New event-type for request generated
+     */
     array(
         'eventname' => '\block_closed_loop_support\event\module_request_generated',
         'callback' => 'block_closed_loop_support_observer::request_generated',
         'internal' => false
     ),
+    
+     /**
+     * For processing existing event \core\event\course_module_created
+     */
     array(
         'eventname' => '\core\event\course_module_created',
         'callback' => 'block_closed_loop_support_observer::module_added',
         'internal' => false
     ),
+     /**
+     * For processing existing event \core\event\course_module_deleted
+     */
     array(
         'eventname' => '\core\event\course_module_deleted',
         'callback' => 'block_closed_loop_support_observer::module_deleted',

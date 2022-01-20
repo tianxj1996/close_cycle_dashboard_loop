@@ -1,17 +1,17 @@
-/**********************/
+/*
+Classes for closed-loop-button are adapted from
+the moodle plugin 'Point of view - Feedback'
+developed by: Quentin Fombaron and Astor Bizard
+https://moodle.org/plugins/block_point_view
+Release v1.6.3
+*/
+
 /* Button cntainer */
 .block_closed_loop_support.button-container {
     z-index: 2 !important;
     position: relative;
 }
 
-/**********************/
-/* Button cntainer */
-.block_closed_loop_support.button-container:hover {
-    background-color: black;
-}
-
-/**********************/
 /* Button position */
 .block_closed_loop_support.button-container .loopButton {
     position: absolute;
@@ -19,38 +19,13 @@
     top: 0;
 }
 
+/* Set size (width) of button*/
 .block_closed_loop_support.button-container .btn-success{
     line-height: 1.2;
 }
 
+/* Color of new row in request-overview-table*/
 .cell_color{
     color: orange;
     font-weight: bold;
-}
-
-
-/*************************************/
-/* Everythin for add response button'*/
-/*************************************/
-.dropdown-response {
-  z-index: 2;
-  position: relative;
-}
-
-.responsespan{
-  position: absolute;
-  right: 82px;
-  top: 0;
-}
-
-.addResponseBtn{
-  background-color: #3498DB;
-  color: white;
-  border: none;
-  cursor: pointer;
-  line-height: 1.2;
-}
-
-.addResponseBtn:hover, .addResponseBtn:focus {
-  background-color: #2980B9;
 }

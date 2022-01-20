@@ -19,7 +19,7 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,10 +37,9 @@ class course_requests_viewed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        //$this->data['objecttable'] = 'course'; TODO: Needed?
-
     }
-    //TODO Translate!
+
+
     /**
      * Returns description of what happened.
      *
@@ -55,6 +54,7 @@ class course_requests_viewed extends \core\event\base {
         }
     }
 
+    
     /**
      * Return localised event name.
      *

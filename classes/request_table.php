@@ -19,7 +19,7 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,12 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 class request_table extends table_sql {
 
-    /**
-     * 
-     * @var type last Time  of check (-1 == never)
-     */
+
     public $unreadRequests = [];
     public $courseid = -1;
+    
     /**
      * Constructor
      * @param int $uniqueid all tables have to have a unique id, this is used
@@ -54,12 +52,11 @@ class request_table extends table_sql {
     }
 
     /**
+     * Show the column 'pic' with link to user-profile
      * @param object $values Contains object with all the values of record.
-     * @return $string Return username with link to profile or username only
-     *     when downloading.
+     * @return $string Return html for picture
      */
     function col_pic($values) {
-        // If the data is being downloaded than we don't want to show HTML.
         global $OUTPUT, $DB;
         if ($this->is_downloading()) {
             return $values->username;
@@ -72,7 +69,7 @@ class request_table extends table_sql {
     /**
      * Extend class for row with new values
      * @param type $row
-     * @return string
+     * @return string css-class
      */
     function get_row_class($row) {
         if(in_array($row->id, $this->unreadRequests)){
@@ -83,27 +80,45 @@ class request_table extends table_sql {
         }
     }
     
+     /**
+     * Show time in standard time format of moodle
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return time as date-string
+     */
     function col_timestamp($values) {
-        return date("Y-m-d H:i:s", $values->timestamp); //TODO: Correct format?
+        return date("Y-m-d H:i:s", $values->timestamp);
     }
     
+     /**
+     * Show the column username with link to user-profile
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return html for link
+     */
     function col_username($values) {
-        // If the data is being downloaded than we don't want to show HTML.
         if ($this->is_downloading()) {
             return $values->username;
         } else {
-            $url = new moodle_url('/user/profile.php', array('id' => $values->userid));
+            $url = new moodle_url('/user/view.php', array('id' => $values->userid, 'course' => $values->courseid));
             return html_writer::link($url, $values->username);
-        }
+        } 
     }
     
+     /**
+     * Show the module with formated name
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return formated name of moduleid
+     */
     function col_moduleid($values){
         $cms = get_fast_modinfo($values->courseid);
         $cm = $cms->get_cm($values->moduleid);
         return $cm->get_formatted_name();
     }
     
-    
+    /**
+     * Show the shortname of course
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return shortname of courseid
+     */
     function col_courseid($values){
         $course = get_course($values->courseid);
         return $course->shortname;

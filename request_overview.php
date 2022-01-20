@@ -19,7 +19,7 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -52,15 +52,15 @@ $PAGE->set_url(new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/reques
 require_capability('block/closed_loop_support:access_requests', $context);
 $download = optional_param('download', '', PARAM_ALPHA);
 
-//TODO: german translation!
 $table = new request_table('uniqueid');
 $table->courseid = $courseid;
-$table->is_downloading($download, 'Requests_overview', 'Overview about requests');
+$headingText = get_string('overviewHeading', 'block_closed_loop_support');
+$table->is_downloading($download, 'Requests_overview', $headingText);
 
 if (!$table->is_downloading()) {
     $PAGE->set_title('Requests overview');
-    $PAGE->set_heading('Overview about requests');
-    $PAGE->navbar->add('Overview about requests', 
+    $PAGE->set_heading($headingText);
+    $PAGE->navbar->add($headingText, 
             new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters));
     $PAGE->set_pagelayout('report');
     echo $OUTPUT->header();
@@ -72,8 +72,6 @@ foreach($unreadRequests as $unread){
     array_push($table->unreadRequests, $unread->requestid);
 }
 
-        
-// Work out the sql for the table.
 $table->set_sql('{block_closed_loop_support}.id, {block_closed_loop_support}.courseid,'
         . '{block_closed_loop_support}.userid, {block_closed_loop_support}.moduleid,'
         . '{block_closed_loop_support}.counter, {block_closed_loop_support}.timestamp,'
@@ -81,7 +79,6 @@ $table->set_sql('{block_closed_loop_support}.id, {block_closed_loop_support}.cou
         , "{block_closed_loop_support}, {user}", "{user}.id = {block_closed_loop_support}.userid");
 
 $table->define_baseurl("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters);
-
 $table->out(20, true);
 
 if (!$table->is_downloading()) {

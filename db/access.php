@@ -19,14 +19,14 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-    /**
+     /**
      * Define who is able to check overiew of requests
      */
     'block/closed_loop_support:access_requests' => array(
@@ -40,14 +40,22 @@ $capabilities = array(
             'coursecreator' => CAP_ALLOW
         )
     ),
+    
+     /**
+     * Define who can generate requests (every logged in user)
+     */
     'block/closed_loop_support:generate_requests' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
-            'user' => CAP_ALLOW //TODO: only student?
+            'user' => CAP_ALLOW
         )
     ),
+    
+     /**
+     * Define who can add a response to a course-module
+     */
     'block/closed_loop_support:add_response' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
@@ -59,6 +67,10 @@ $capabilities = array(
             'coursecreator' => CAP_ALLOW
         )
     ),
+    
+     /**
+     * Define who can add the block to it's dashboard (every logged in user)
+     */
     'block/closed_loop_support:myaddinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
@@ -68,6 +80,12 @@ $capabilities = array(
         ),
         'clonepermissionsfrom' => 'moodle/my:manageblocks'
      ),
+    
+     /**
+     * Define who can add the block to a course 
+     * what is different than 'myaddinstance' which is for the 
+     * more general CONTEXT_SYSTEM
+     */
     'block/closed_loop_support:addinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',

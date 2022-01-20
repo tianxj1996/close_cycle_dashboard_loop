@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Closed loop support external lib
+ * Class for external_api
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,7 +58,6 @@ class block_closed_loop_support_external_data extends external_api {
         return block_closed_loop_support_write_request($USER->id, $courseid, $cmid);
     }
     
-    
     /**
     * Parameters definition for read_requests
     */
@@ -70,7 +69,6 @@ class block_closed_loop_support_external_data extends external_api {
         );
     }
     
-    
     /**
     * read_requests
     */
@@ -79,7 +77,6 @@ class block_closed_loop_support_external_data extends external_api {
         require_once(__DIR__ . '/locallib.php');
         return block_closed_loop_support_get_new_requests_teacher($USER->id, $courseid);
     }
-    
     
     /**
     * Return values of read_requests
@@ -112,7 +109,6 @@ class block_closed_loop_support_external_data extends external_api {
             );
     }
     
-    
     /**
     * Parameters definition for get_response_content
     *
@@ -127,7 +123,6 @@ class block_closed_loop_support_external_data extends external_api {
         );
     }
     
-    
     /**
     * get_response_content
     */
@@ -135,10 +130,6 @@ class block_closed_loop_support_external_data extends external_api {
         require_once(__DIR__ . '/locallib.php');
         return block_closed_loop_support_get_response_content($courseid, $moduleid);
     }
-    
-    
-    
-    
     
     /**
     * Return title and content for get_response_content
@@ -148,7 +139,6 @@ class block_closed_loop_support_external_data extends external_api {
     public static function get_responselist_html_returns() {
         return new external_value(PARAM_RAW, 'Response list');
     }
-    
     
     /**
     * Parameters definition for get_response_content
@@ -162,7 +152,6 @@ class block_closed_loop_support_external_data extends external_api {
             )
         );
     }
-    
     
     /**
     * get_response_content

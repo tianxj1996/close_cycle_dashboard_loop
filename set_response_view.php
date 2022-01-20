@@ -19,7 +19,7 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,13 +30,12 @@ require_once('classes/set_response_form.php');
 
 global $DB, $OUTPUT, $PAGE;
 
-// Check for all required variables.
 $courseid = required_param('courseid', PARAM_INT);
 $sectionid = required_param('sectionid', PARAM_INT);
 $moduleid = required_param('moduleid', PARAM_INT);
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
-    print_error('invalidcourse', 'block_closed_loop_support', $courseid);
+    print_error('wrongCourse', 'block_closed_loop_support', $courseid);
 }
 
 $form_parameters = array('courseid' => $courseid,
@@ -49,20 +48,12 @@ $PAGE->set_url('/blocks/closed_loop_support/set_response_view.php', $form_parame
 $PAGE->set_pagelayout('standard');
 $PAGE->set_heading('Set closed loop response');
 
-$settingsnode = $PAGE->settingsnav->add('Test123');
 $reloadurl = new moodle_url('/blocks/closed_loop_support/set_response_view.php', $form_parameters);
-$editnode = $settingsnode->add('Set Response', $reloadurl);
-$editnode->make_active(0);
-
 $setresponse_form = new setresponse_form($courseid, $sectionid, $moduleid, $reloadurl);   
 $courseurl = new moodle_url('/course/view.php', array('id' => $courseid));
 
-
-
-
 if($setresponse_form->is_cancelled()) {
     redirect($courseurl);
-
 } 
 else if ($fromform = $setresponse_form->get_data()) {
     block_closed_loop_support_set_response_config($courseid, $moduleid, $fromform);

@@ -19,7 +19,7 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,3 +34,14 @@ $string['eventcourserequestsviewed'] = 'Requests for course viewed';
 $string['eventmoduleRequstGenerated'] = 'Request for course-module generated';
 $string['setResponse'] = 'Set response content';
 $string['setSectionModule'] = 'Course section and module';
+$string['defResModule'] = '<h5>Define responses for modules</h5>';
+$string['defNoRespAddable'] = '<br>On course-page responses can be added here';
+$string['defMissingCapabilitys'] = '<br><b>You have not required capabilitys!</b>';
+$string['overviewHeading'] = 'Overview about requests';
+$string['wrongCourse'] = 'Course with id {$a} not found';
+
+$string['closed_loop_support:access_requests'] = 'Overview about closed loop requests';
+$string['closed_loop_support:generate_requests'] = 'Generate a closed loop request for a course-module';
+$string['closed_loop_support:add_response'] = 'Add response to course-module for closed loop requests';
+$string['closed_loop_support:addinstance'] = 'Add a Closed loop support  instance';
+$string['closed_loop_support:myaddinstance'] = 'Add a Closed loop support block instance on dashboard';

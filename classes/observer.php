@@ -19,27 +19,43 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 class block_closed_loop_support_observer{
     
+     /**
+     * Process course_requests_viewed event
+     * @param \block_closed_loop_support\event\course_requests_viewed $event 
+     */
     public static function viewed(\block_closed_loop_support\event\course_requests_viewed $event){
         require_once(__DIR__ . '/../locallib.php');
         
         block_closed_loop_support_set_requests_viewed($event->userid, $event->courseid);
     }
     
+     /**
+     * Process module_request_generated event (actually only placeholder cause it is required for definition of new event)
+     * @param \block_closed_loop_support\event\module_request_generated $event 
+     */
     public static function request_generated(\block_closed_loop_support\event\module_request_generated $event){
         return;
     }
     
+     /**
+     * Process course_module_created event
+     * @param \core\event\course_module_created $event 
+     */
     public static function module_added(\core\event\course_module_created $event){
         require_once(__DIR__ . '/../locallib.php');
         block_closed_loop_support_create_response($event->courseid, [$event->objectid]);
     }
     
+     /**
+     * Process course_module_deleted event
+     * @param \core\event\course_module_deleted $event 
+     */
     public static function module_deleted(\core\event\course_module_deleted $event){
         require_once(__DIR__ . '/../locallib.php');
         block_closed_loop_support_delete_response($event->courseid, [$event->objectid]);

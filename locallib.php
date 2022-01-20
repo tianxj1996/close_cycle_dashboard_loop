@@ -15,25 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Point of View external lib
+ * Closed loop support local lib with db access
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * Check if new requests exists for teacher in respect to teacher last request check
- * and return them
- * 
- * @return boolean Description
- *
-*/
 
 defined('MOODLE_INTERNAL') || die();
 
-
+/**
+ * Check if new requests exists for teacher in respect to teacher last request check
+ * and return only the ids
+ * 
+ * @param int $userid
+ * @param int $courseid
+ * @return boolean Description
+ *
+*/
 function block_closed_loop_support_get_new_requests_teacher_ids(int $userid, int $courseid = -1){
     global $DB;
     
@@ -49,7 +50,14 @@ function block_closed_loop_support_get_new_requests_teacher_ids(int $userid, int
     }
 }
 
-
+/**
+ * Check if new requests exists for teacher and generate values for mustache
+ * 
+ * @param int $userid
+ * @param int $courseid
+ * @return array mustache-values
+ *
+*/
 function block_closed_loop_support_get_new_requests_teacher(int $userid, int $courseid = -1){
     global $DB, $CFG;
     
@@ -83,8 +91,13 @@ function block_closed_loop_support_get_new_requests_teacher(int $userid, int $co
         'Url' => $url->out()];
 }
 
-
-
+/**
+ * Process requests viewed by user
+ * 
+ * @param int $userid
+ * @param int $courseid
+ *
+*/
 function block_closed_loop_support_set_requests_viewed(int $userid, int $courseid = -1){
     global $DB;
     $tableTeacher = 'block_closed_loop_teacher';
@@ -100,7 +113,14 @@ function block_closed_loop_support_set_requests_viewed(int $userid, int $coursei
     }
 }
 
-
+/**
+ * Write new requests into db, inform responsible user and generate event for it
+ * 
+ * @param int $userid
+ * @param int $courseid
+ * @param int $cmid
+ *
+*/
 function block_closed_loop_support_write_request(int $userid, int $courseid, int $cmid){
     global $DB;
     $table = 'block_closed_loop_support';
@@ -143,7 +163,13 @@ function block_closed_loop_support_write_request(int $userid, int $courseid, int
     $event->trigger();
 }
 
-
+/**
+ * Delete responses
+ * 
+ * @param int $courseid
+ * @param int $moduleids
+ *
+*/
 function block_closed_loop_support_delete_response($courseid, $moduleids = NULL){
     global $DB;
     $tableResponse = 'block_closed_loop_response';
@@ -168,7 +194,13 @@ function block_closed_loop_support_delete_response($courseid, $moduleids = NULL)
     }
 }
 
-
+/**
+ * Set value for existing responses
+ * 
+ * @param int $courseid
+ * @param int $moduleids
+ * @param int $value
+*/
 function block_closed_loop_support_set_response($courseid, $moduleid = -1, $value = 0){
     global $DB;
     $tableResponse = 'block_closed_loop_response';
@@ -180,7 +212,13 @@ function block_closed_loop_support_set_response($courseid, $moduleid = -1, $valu
     }
 }
 
-
+/**
+ * Create new responses
+ * 
+ * @param int $courseid
+ * @param int $moduleids
+ * @param int $value
+*/
 function block_closed_loop_support_create_response($courseid, $moduleids = NULL, $value = 0){
     global $DB;
     $tableResponse = 'block_closed_loop_response';
@@ -200,7 +238,13 @@ function block_closed_loop_support_create_response($courseid, $moduleids = NULL,
     $DB->insert_records($tableResponse, $data);
 }
 
-
+/**
+ * Set response config from a editor-form-data
+ * 
+ * @param int $courseid
+ * @param int $moduleids
+ * @param stdClass $formdata
+*/
 function block_closed_loop_support_set_response_config($courseid, $moduleid, $formdata){
         global $DB, $CFG;
         $cond = ['courseid' => $courseid, 'moduleid' => $moduleid];
@@ -218,11 +262,15 @@ function block_closed_loop_support_set_response_config($courseid, $moduleid, $fo
 
         $formdata->config_text['text'] = $textCorrect;
         $DB->set_field('block_closed_loop_response', 'config', base64_encode(serialize($formdata)) , $cond);
-        
-        
 }
 
-
+/**
+ * Get response config
+ * 
+ * @param int $courseid
+ * @param int $moduleids
+ * @return stdClass Config object
+*/
 function block_closed_loop_support_get_response_config($courseid, $moduleid){
         global $DB, $CFG;
         require_once($CFG->libdir . '/filelib.php');
@@ -244,8 +292,13 @@ function block_closed_loop_support_get_response_config($courseid, $moduleid){
         $contentOriginal->config_text['text'] = $correctText;
         return $contentOriginal;
 }
-
-
+/*
+ * Get response config content
+ * 
+ * @param int $courseid
+ * @param int $moduleids
+ * @return array Config object content and pregenerated title
+*/
 function block_closed_loop_support_get_response_content($courseid, $moduleid){
         global $DB;
         $content = block_closed_loop_support_get_response_config($courseid, $moduleid);
@@ -258,7 +311,12 @@ function block_closed_loop_support_get_response_content($courseid, $moduleid){
         return ['title' => $title,'content' => $content->config_text['text']];
 }
 
-
+/*
+ * Get list of responses for a course
+ * 
+ * @param int $courseid
+ * @return array responses
+*/
 function block_closed_loop_support_get_responselist($courseid) {
         global $DB;
         $dataResponse = $DB->get_records('block_closed_loop_response', 
@@ -266,7 +324,12 @@ function block_closed_loop_support_get_responselist($courseid) {
         return $dataResponse;
 }
 
-
+/*
+ * Get html for list of responses of a course
+ * 
+ * @param int $courseid
+ * @return string responses html list
+*/
 function block_closed_loop_support_get_responselist_html($courseid) {
         global $DB, $CFG;
         $dataResponse = $DB->get_records('block_closed_loop_response', ['courseid' => $courseid], '', 'moduleid, setresponse');

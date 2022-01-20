@@ -16,8 +16,12 @@
 /**
  * Manage buttons and response for closed loop support
  * @copyright  2022 Rene Hilgemann
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+
+
 
 import * as Templates from 'core/templates';
 import * as Notification from 'core/notification';
@@ -105,6 +109,13 @@ export const init = (requestButtons) => {
             moduleid: Object.values(requestButtons)[i].moduleid
         };
 
+        /**
+        General idea for placing button into 'module-<X>'
+        adapted from moodle plugin 'Point of view - Feedback'
+        developed by: Quentin Fombaron and Astor Bizard
+        https://moodle.org/plugins/block_point_view
+        Release v1.6.3
+        */
         var element = document.getElementById('module-' + data.moduleid);
         if(element)
         {

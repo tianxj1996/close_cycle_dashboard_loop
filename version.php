@@ -19,12 +19,12 @@
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
- * @author     Rene Hilgemann <rene.hilgemann@gmx.net>
+ * @author     Rene Hilgemann <rene.hilgemann@stud.uni-due.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later   
  */
 
 defined('MOODLE_INTERNAL') || die();
-$pluginVersion = 2021121626;    //TODO: Modify at the end
+$pluginVersion = 2021121627;    //TODO: Modify at the end
 
 $plugin->component = 'block_closed_loop_support';
 $plugin->version   = $pluginVersion; 
