@@ -82,13 +82,20 @@ class block_closed_loop_support extends block_base{
             $startSetResponse = "<h5>Define responses for modules</h5>";
             if(has_capability('block/closed_loop_support:add_response', $this->context) 
                     && $this->page->context->contextlevel == CONTEXT_COURSE){
-                $this->content->text = $startSetResponse . block_closed_loop_support_get_responselist_html($COURSE->id);
+                $this->content->text = 
+                        $startSetResponse . 
+                        html_writer::start_div('', ['id' => 'define_response_list']). 
+                        block_closed_loop_support_get_responselist_html($COURSE->id).
+                        html_writer::end_div();
+                
             }
             else{
-                if(!has_capability('block/closed_loop_support:add_response', $this->context)){
+                if($this->page->context->contextlevel != CONTEXT_COURSE){
+                      $this->content->text = "<br>On course-page responses can be added here";
+                }
+                else if(!has_capability('block/closed_loop_support:add_response', $this->context)){
                     $this->content->text = $startSetResponse . "<br><b>You have not required capabilitys!</b>";
-                }else if($this->page->context->contextlevel != CONTEXT_COURSE)
-                    $this->content->text = "<br>On course-page responses can be added here";
+                }
             }
         }
         
@@ -119,8 +126,8 @@ class block_closed_loop_support extends block_base{
         }
         else{
             if(has_capability('block/closed_loop_support:add_response', $this->context)){
-                /*$this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_support_add_response_button', 
-                    'init', [$param]);*/
+                $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_list_reload', 
+                    'init', [$COURSE->id]);
             }
         }
     }
@@ -134,9 +141,12 @@ class block_closed_loop_support extends block_base{
         require_once(__DIR__ . '/locallib.php');
         
         //If old values exist, delete them
-        block_closed_loop_support_delete_response($COURSE->id);
-        
-        block_closed_loop_support_create_response($COURSE->id);
+        if($this->page->context->contextlevel == CONTEXT_COURSE){
+            block_closed_loop_support_delete_response($COURSE->id);
+            block_closed_loop_support_create_response($COURSE->id);
+        }
+            
+
         return true;
     }
     
@@ -149,7 +159,9 @@ class block_closed_loop_support extends block_base{
         require_once(__DIR__ . '/locallib.php');
         
         //If old values exist, delete them
-        block_closed_loop_support_delete_response($COURSE->id);
+        if($this->page->context->contextlevel == CONTEXT_COURSE){
+            block_closed_loop_support_delete_response($COURSE->id);
+        }
         return true;
     }
         

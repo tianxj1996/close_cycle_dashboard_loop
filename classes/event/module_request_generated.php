@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * event class course_requests_viewd
+ * event class module_request_generated
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
@@ -27,7 +27,7 @@ namespace block_closed_loop_support\event;
 defined('MOODLE_INTERNAL') || die();
 
 
-class course_requests_viewed extends \core\event\base {
+class module_request_generated extends \core\event\base {
 
     /**
      * Init method.
@@ -37,22 +37,16 @@ class course_requests_viewed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        //$this->data['objecttable'] = 'course'; TODO: Needed?
-
     }
-    //TODO Translate!
+
     /**
      * Returns description of what happened.
      *
      * @return string
      */
     public function get_description() {
-        if($this->courseid < 0){
-            return "The teacher with id '$this->userid' viewed the requests for all courses he/she is responsible for'.";
-        }
-        else{
-            return "The teacher with id '$this->userid' viewed the requests for the course with id '$this->courseid'.";
-        }
+        return "The User with id '{$this->data['userid']}' asked for support for the module '{$this->contextinstanceid}'"
+        . " in the course '{$this->data['courseid']}'.";
     }
 
     /**
@@ -61,17 +55,7 @@ class course_requests_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventcourserequestsviewed', 'block_closed_loop_support');
-    }
-
-    /**
-     * Get URL related to the action.
-     *
-     * @return \moodle_url|null
-     */
-    public function get_url() {
-        global $CFG;
-        return new \moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", array('id' => $this->courseid));
+        return get_string('eventmoduleRequstGenerated', 'block_closed_loop_support');
     }
 
 }

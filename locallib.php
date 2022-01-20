@@ -135,6 +135,12 @@ function block_closed_loop_support_write_request(int $userid, int $courseid, int
     }
 
     $DB->insert_records($tableTeacher, $data);
+    
+    // Trigger event, request generated (for log)
+    $contextModule = get_context_instance(CONTEXT_MODULE, $cmid);
+    $eventparams = array('courseid' => $courseid, 'userid' =>$userid, 'contextid' => $contextModule->id);
+    $event = \block_closed_loop_support\event\module_request_generated::create($eventparams);
+    $event->trigger();
 }
 
 
@@ -157,8 +163,8 @@ function block_closed_loop_support_delete_response($courseid, $moduleids = NULL)
     }
     
     foreach($requestids as $rid){
-        $DB->delete_records('block_closed_loop_teacher', ['requestid' => $rid]);
-        $DB->delete_records('block_closed_loop_support', ['id' => $rid]);
+        $DB->delete_records('block_closed_loop_teacher', ['requestid' => $rid->id]);
+        $DB->delete_records('block_closed_loop_support', ['id' => $rid->id]);
     }
 }
 
@@ -262,16 +268,18 @@ function block_closed_loop_support_get_responselist($courseid) {
 
 
 function block_closed_loop_support_get_responselist_html($courseid) {
-        global $DB, $CFG, $OUTPUT;
+        global $DB, $CFG;
         $dataResponse = $DB->get_records('block_closed_loop_response', ['courseid' => $courseid], '', 'moduleid, setresponse');
         $col_array = array_column($dataResponse, 'setresponse', 'moduleid');
         $coursename = get_course($courseid)->fullname;
         $cms = get_fast_modinfo($courseid);
-        $iconSet = $OUTPUT->pix_icon('i/valid', 'Set');
-        $iconNotSet = $OUTPUT->pix_icon('i/invalid', 'Not set');
+        $iconSet = '<i class="icon fa fa-check text-success fa-fw " '
+                . 'title="Set" aria-label="Set"></i>';//$OUTPUT->pix_icon('i/valid', 'Set');
+        $iconNotSet = '<i class="icon fa fa-times text-danger fa-fw " '
+                . 'title="Not set" aria-label="Not set"></i>';//$OUTPUT->pix_icon('i/invalid', 'Not set');
         
         //TODO: more nice!
-        $output = html_writer::start_div();
+        $output = "";
         $sectMod = [];
         foreach ($dataResponse as $response){
             $cm = $cms->get_cm($response->moduleid);
@@ -312,7 +320,6 @@ function block_closed_loop_support_get_responselist_html($courseid) {
             $counter += 1;
         }
         $output .= html_writer::end_tag('ul');
-        $output .= html_writer::end_div();
         return $output;
 }
 

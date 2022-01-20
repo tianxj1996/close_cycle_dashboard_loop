@@ -135,4 +135,40 @@ class block_closed_loop_support_external_data extends external_api {
         require_once(__DIR__ . '/locallib.php');
         return block_closed_loop_support_get_response_content($courseid, $moduleid);
     }
+    
+    
+    
+    
+    
+    /**
+    * Return title and content for get_response_content
+    *
+    * @return external_multiple_structure
+    */
+    public static function get_responselist_html_returns() {
+        return new external_value(PARAM_RAW, 'Response list');
+    }
+    
+    
+    /**
+    * Parameters definition for get_response_content
+    *
+    * @return external_value
+    */
+    public static function get_responselist_html_parameters() {
+        return new external_function_parameters(
+            array(
+                'courseid' => new external_value(PARAM_INT, 'id of course', VALUE_REQUIRED),
+            )
+        );
+    }
+    
+    
+    /**
+    * get_response_content
+    */
+    public static function get_responselist_html(int $courseid) {
+        require_once(__DIR__ . '/locallib.php');
+        return block_closed_loop_support_get_responselist_html($courseid);
+    }
 }

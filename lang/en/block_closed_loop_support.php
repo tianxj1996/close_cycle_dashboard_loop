@@ -31,5 +31,6 @@ $string['newRequests'] = 'There are {$a} new requests';
 $string['newRequest'] = 'There is one new request';
 $string['blockAccessDenied'] = 'Access denied for request overview';
 $string['eventcourserequestsviewed'] = 'Requests for course viewed';
+$string['eventmoduleRequstGenerated'] = 'Request for course-module generated';
 $string['setResponse'] = 'Set response content';
 $string['setSectionModule'] = 'Course section and module';

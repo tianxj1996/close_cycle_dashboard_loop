@@ -49,5 +49,13 @@ $functions = array(
         'description' => 'Get content of response for student',
         'type'        => 'read',
         'ajax'        => true
+    ),
+    'block_closed_loop_support_get_responselist_html' => array(
+        'classname'   => 'block_closed_loop_support_external_data',
+        'methodname'  => 'get_responselist_html',
+        'classpath'   => 'blocks/closed_loop_support/externallib.php',
+        'description' => 'Get response-list html element',
+        'type'        => 'read',
+        'ajax'        => true
     )
     );

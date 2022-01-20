@@ -32,6 +32,11 @@ $observers = array(
         'internal' => false
     ),
     array(
+        'eventname' => '\block_closed_loop_support\event\module_request_generated',
+        'callback' => 'block_closed_loop_support_observer::request_generated',
+        'internal' => false
+    ),
+    array(
         'eventname' => '\core\event\course_module_created',
         'callback' => 'block_closed_loop_support_observer::module_added',
         'internal' => false
@@ -42,4 +47,3 @@ $observers = array(
         'internal' => false
     )
 );
-    
