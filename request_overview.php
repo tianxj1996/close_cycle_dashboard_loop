@@ -39,7 +39,9 @@ if($courseid !== -1){
 }
 else
 {
-    $context = context_system::instance();
+    //In this case the dialog has to be started from dashboard and the user
+    //needs block/closed_loop_support:myaddinstance for its own usercontext 
+    $context = context_user::instance($USER->id);
 }
 
 $PAGE->set_context($context);
@@ -49,7 +51,13 @@ $parameters = array (
 );
 
 $PAGE->set_url(new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters));
-require_capability('block/closed_loop_support:access_requests', $context);
+if($courseid !== -1){
+    require_capability('block/closed_loop_support:access_requests', $context);
+}
+else{
+    require_capability('block/closed_loop_support:myaddinstance', $context);
+}
+
 $download = optional_param('download', '', PARAM_ALPHA);
 
 $table = new request_table('uniqueid');

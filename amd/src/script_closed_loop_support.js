@@ -105,7 +105,8 @@ export const init = (requestButtons) => {
     for(let i = 0; i < Object.values(requestButtons).length; i++){
         const data = {
             courseid: Object.values(requestButtons)[i].courseid,
-            moduleid: Object.values(requestButtons)[i].moduleid
+            moduleid: Object.values(requestButtons)[i].moduleid,
+            tooltip: Object.values(requestButtons)[i].tooltip
         };
 
         /**

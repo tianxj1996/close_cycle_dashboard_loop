@@ -62,7 +62,9 @@ class request_table extends table_sql {
             return $values->username;
         } else {
             $user = $DB->get_record('user', array('id' => $values->userid));
-            return $OUTPUT->user_picture($user, array('size'=>30));
+            $original = $OUTPUT->user_picture($user, array('size'=>30));
+            $newWithTooptip = str_replace("<img src", "<img title='Go to profile' src", $original);
+            return $newWithTooptip;
         }
     }
     
@@ -99,7 +101,7 @@ class request_table extends table_sql {
             return $values->username;
         } else {
             $url = new moodle_url('/user/view.php', array('id' => $values->userid, 'course' => $values->courseid));
-            return html_writer::link($url, $values->username);
+            return html_writer::link($url, $values->username, ['title' => 'Go to Profile']);
         } 
     }
     

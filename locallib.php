@@ -81,8 +81,17 @@ function block_closed_loop_support_get_new_requests_teacher(int $userid, int $co
     }
     else{
         $text = get_string('noRequest', 'block_closed_loop_support');
-        $btnClass = "btn-info";
+        $btnClass = "btn-primary";
     }
+    
+    if($courseid === -1){
+        $text2 = get_string('forAll', 'block_closed_loop_support');
+    }
+    else{
+        $text2 = get_string('forCourse', 'block_closed_loop_support');
+    }
+    $text .= " " . $text2;
+    
     $url = new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", 
                     array('courseid'=> $courseid));
     
@@ -322,6 +331,11 @@ function block_closed_loop_support_get_responselist($courseid) {
         global $DB;
         $dataResponse = $DB->get_records('block_closed_loop_response', 
                 ['courseid' => $courseid, 'setresponse' => 1], '', 'id, courseid, moduleid');
+        $cms = get_fast_modinfo($courseid);
+        foreach($dataResponse as $resp){
+            $cm = $cms->get_cm($resp->moduleid);
+            $resp->tooltip = $cm->get_formatted_name();
+        }
         return $dataResponse;
 }
 

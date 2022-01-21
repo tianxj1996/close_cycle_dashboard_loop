@@ -44,7 +44,7 @@ class block_closed_loop_support extends block_base{
     public function applicable_formats() {
         return array(
                 'admin' => false,
-                'site-index' => false,
+                'site-index' => true,
                 'course-view' => true,
                 'mod' => false,
                 'my' => true
@@ -62,6 +62,7 @@ class block_closed_loop_support extends block_base{
         $startSetResponse = get_string('defResModule', 'block_closed_loop_support');
         
         //First case: We are on the dashboard and only 'myaddinstance' is relevant
+        $isNotsiteindex = (strpos($this->page->pagetype, 'site-index') !== 0);
         if($this->page->context->contextlevel == CONTEXT_USER){
 
             if(!has_capability('block/closed_loop_support:myaddinstance', $this->context)){
@@ -80,7 +81,7 @@ class block_closed_loop_support extends block_base{
         }
         
         //Second case: We are on a course page
-        if ($this->page->context->contextlevel == CONTEXT_COURSE){
+        if ($this->page->context->contextlevel == CONTEXT_COURSE && $isNotsiteindex){
             
             if(!$this->page->user_is_editing()){
                 
@@ -95,7 +96,7 @@ class block_closed_loop_support extends block_base{
             }
             else{
                 if(has_capability('block/closed_loop_support:add_response', $this->context) 
-                    && $this->page->context->contextlevel == CONTEXT_COURSE){
+                    && $this->page->context->contextlevel == CONTEXT_COURSE && $isNotsiteindex){
                     $this->content->text = 
                             $startSetResponse . 
                             html_writer::start_div('', ['id' => 'define_response_list']). 
@@ -122,6 +123,7 @@ class block_closed_loop_support extends block_base{
         
         
         //First case: We are on the dashboard and only 'myaddinstance' is relevant
+        $isNotsiteindex = (strpos($this->page->pagetype, 'site-index') !== 0);
         if($this->page->context->contextlevel == CONTEXT_USER &&
                 has_capability('block/closed_loop_support:myaddinstance', $this->context)){
             
@@ -134,7 +136,7 @@ class block_closed_loop_support extends block_base{
             }
         }
         //We are in a course
-        else if ($this->page->context->contextlevel == CONTEXT_COURSE ){
+        else if ($this->page->context->contextlevel == CONTEXT_COURSE && $isNotsiteindex){
             
             if($this->page->user_is_editing()){
                 

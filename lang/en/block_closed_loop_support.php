@@ -26,9 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Closed loop support';
-$string['noRequest'] = 'No new feedback-requestes';
+$string['noRequest'] = 'No new feedback-requests';
 $string['newRequests'] = 'There are {$a} new requests';
 $string['newRequest'] = 'There is one new request';
+$string['forAll'] = 'for any course';
+$string['forCourse'] = 'for this course';
 $string['blockAccessDenied'] = 'Access denied for request overview';
 $string['eventcourserequestsviewed'] = 'Requests for course viewed';
 $string['eventmoduleRequstGenerated'] = 'Request for course-module generated';
