@@ -141,7 +141,7 @@ function block_closed_loop_support_write_request(int $userid, int $courseid, int
     if (!$DB->record_exists($table, $conditions)) {
         $counter = 1;
     } else {
-        $counter = $DB->get_field($table, 'counter', $conditions) + 1;
+        $counter = $DB->count_records($table, $conditions) + 1;
     }
 
     $dataobject = array(
