@@ -44,7 +44,7 @@ class block_closed_loop_support extends block_base{
     public function applicable_formats() {
         return array(
                 'admin' => false,
-                'site-index' => true,
+                'site-index' => false,
                 'course-view' => true,
                 'mod' => false,
                 'my' => true
@@ -59,32 +59,50 @@ class block_closed_loop_support extends block_base{
         global $PAGE, $DB, $USER, $COURSE, $CFG, $OUTPUT;
         require_once(__DIR__ . '/locallib.php');
         $this->content = new stdClass();
+        $startSetResponse = get_string('defResModule', 'block_closed_loop_support');
+        
+        //First case: We are on the dashboard and only 'myaddinstance' is relevant
+        if($this->page->context->contextlevel == CONTEXT_USER){
 
-        if(!$this->page->user_is_editing()){
-            if(has_capability('block/closed_loop_support:access_requests', $this->context)){
-                $data = block_closed_loop_support_get_new_requests_teacher($USER->id, $COURSE->id);
+            if(!has_capability('block/closed_loop_support:myaddinstance', $this->context)){
+                return null;
+            }
+            
+            if(!$this->page->user_is_editing()){
+                $data = block_closed_loop_support_get_new_requests_teacher($USER->id, -1);
                 $this->content->text = 
                         $OUTPUT->render_from_template('block_closed_loop_support/requestLink', $data);
             }
-            else if(has_capability('block/closed_loop_support:generate_requests', $this->context)){
-                return null;
+            else{
+                $this->content->text = $startSetResponse . get_string('defNoRespAddable', 'block_closed_loop_support');
             }
+            return  $this->content;
         }
-        else{
-            $startSetResponse = get_string('defResModule', 'block_closed_loop_support');
-            if(has_capability('block/closed_loop_support:add_response', $this->context) 
-                    && $this->page->context->contextlevel == CONTEXT_COURSE){
-                $this->content->text = 
-                        $startSetResponse . 
-                        html_writer::start_div('', ['id' => 'define_response_list']). 
-                        block_closed_loop_support_get_responselist_html($COURSE->id).
-                        html_writer::end_div();
+        
+        //Second case: We are on a course page
+        if ($this->page->context->contextlevel == CONTEXT_COURSE){
+            
+            if(!$this->page->user_is_editing()){
+                
+                if(has_capability('block/closed_loop_support:access_requests', $this->context)){
+                    $data = block_closed_loop_support_get_new_requests_teacher($USER->id, $COURSE->id);
+                    $this->content->text = 
+                        $OUTPUT->render_from_template('block_closed_loop_support/requestLink', $data);
+                }
+                else{
+                    return null;
+                }
             }
             else{
-                if($this->page->context->contextlevel != CONTEXT_COURSE){
-                      $this->content->text = get_string('defNoRespAddable', 'block_closed_loop_support');
+                if(has_capability('block/closed_loop_support:add_response', $this->context) 
+                    && $this->page->context->contextlevel == CONTEXT_COURSE){
+                    $this->content->text = 
+                            $startSetResponse . 
+                            html_writer::start_div('', ['id' => 'define_response_list']). 
+                            block_closed_loop_support_get_responselist_html($COURSE->id).
+                            html_writer::end_div();
                 }
-                else if(!has_capability('block/closed_loop_support:add_response', $this->context)){
+                else{
                     $this->content->text = $startSetResponse . get_string('defMissingCapabilitys', 'block_closed_loop_support');
                 }
             }
@@ -101,22 +119,41 @@ class block_closed_loop_support extends block_base{
 
         global $COURSE;
         require_once(__DIR__ . '/locallib.php');
-
-        if(!$this->page->user_is_editing()){
-           if(has_capability('block/closed_loop_support:access_requests', $this->context)){
-             $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_request_link_update', 
-                    'init', [$COURSE->id]);
-            }
-            if(has_capability('block/closed_loop_support:generate_requests', $this->context)){
-                $param = block_closed_loop_support_get_responselist($COURSE->id);
-                $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_support', 
-                    'init', [$param]);
+        
+        
+        //First case: We are on the dashboard and only 'myaddinstance' is relevant
+        if($this->page->context->contextlevel == CONTEXT_USER &&
+                has_capability('block/closed_loop_support:myaddinstance', $this->context)){
+            
+            if(!$this->page->user_is_editing()){
+                
+                if(has_capability('block/closed_loop_support:access_requests', $this->context)){
+                    $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_request_link_update', 
+                    'init', [-1]);
+                }
             }
         }
-        else{
-            if(has_capability('block/closed_loop_support:add_response', $this->context)){
-                $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_list_reload', 
+        //We are in a course
+        else if ($this->page->context->contextlevel == CONTEXT_COURSE ){
+            
+            if($this->page->user_is_editing()){
+                
+                if(has_capability('block/closed_loop_support:add_response', $this->context)){
+                    $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_list_reload', 
                     'init', [$COURSE->id]);
+                }
+            }
+            else{
+                if(has_capability('block/closed_loop_support:generate_requests', $this->context)){
+                    $param = block_closed_loop_support_get_responselist($COURSE->id);
+                    $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_support', 
+                        'init', [$param]);
+                }
+                
+                if(has_capability('block/closed_loop_support:access_requests', $this->context)){
+                    $this->page->requires->js_call_amd('block_closed_loop_support/script_closed_loop_request_link_update', 
+                    'init', [$COURSE->id]);
+                }
             }
         }
     }

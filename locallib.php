@@ -38,15 +38,15 @@ defined('MOODLE_INTERNAL') || die();
 function block_closed_loop_support_get_new_requests_teacher_ids(int $userid, int $courseid = -1){
     global $DB;
     
-    $tableTimestamp = 'block_closed_loop_teacher';
+    $tableTeacher = 'block_closed_loop_teacher';
     $conditions = array('userid' => $userid, 'courseid' => $courseid);
     $counter = 0;
     if($courseid === -1){
         
-        return $DB->get_records($tableTimestamp, ['userid' => $userid]);
+        return $DB->get_records($tableTeacher, ['userid' => $userid]);
     }
     else{
-        return $DB->get_records($tableTimestamp, $conditions);
+        return $DB->get_records($tableTeacher, $conditions);
     }
 }
 
@@ -61,15 +61,15 @@ function block_closed_loop_support_get_new_requests_teacher_ids(int $userid, int
 function block_closed_loop_support_get_new_requests_teacher(int $userid, int $courseid = -1){
     global $DB, $CFG;
     
-    $tableTimestamp = 'block_closed_loop_teacher';
+    $tableTeacher = 'block_closed_loop_teacher';
     $conditions = array('userid' => $userid, 'courseid' => $courseid);
     $counter = 0;
     if($courseid === -1){
         
-        $counter = count($DB->get_records($tableTimestamp, ['userid' => $userid]));
+        $counter = count($DB->get_records($tableTeacher, ['userid' => $userid]));
     }
     else{
-        $counter = count($DB->get_records($tableTimestamp, $conditions));
+        $counter = count($DB->get_records($tableTeacher, $conditions));
     }
     if($counter > 1){
         $text = get_string('newRequests', 'block_closed_loop_support', $counter);
@@ -185,7 +185,6 @@ function block_closed_loop_support_delete_response($courseid, $moduleids = NULL)
                     ['courseid' => $courseid, 'moduleid' => $moduleid]));
             $DB->delete_records($tableResponse, ['courseid' => $courseid, 'moduleid' => $moduleid]);
         }
-
     }
     
     foreach($requestids as $rid){

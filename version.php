@@ -24,7 +24,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-$pluginVersion = 2021121629;    //TODO: Modify at the end
+$pluginVersion = 2021121630;    //TODO: Modify at the end
 
 $plugin->component = 'block_closed_loop_support';
 $plugin->version   = $pluginVersion; 

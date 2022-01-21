@@ -54,12 +54,13 @@ $download = optional_param('download', '', PARAM_ALPHA);
 
 $table = new request_table('uniqueid');
 $table->courseid = $courseid;
-$headingText = get_string('overviewHeading', 'block_closed_loop_support');
+$headingText = get_string('overviewHeadingCourse', 'block_closed_loop_support');
+$headingTextAll = get_string('overviewHeadingAll', 'block_closed_loop_support');
 $table->is_downloading($download, 'Requests_overview', $headingText);
 
 if (!$table->is_downloading()) {
     $PAGE->set_title('Requests overview');
-    $PAGE->set_heading($headingText);
+    $PAGE->set_heading($courseid == -1 ? $headingTextAll : $headingText);
     $PAGE->navbar->add($headingText, 
             new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters));
     $PAGE->set_pagelayout('report');

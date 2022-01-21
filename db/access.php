@@ -69,14 +69,13 @@ $capabilities = array(
     ),
     
      /**
-     * Define who can add the block to it's dashboard (every logged in user)
+     * Define who can add the block to it's dashboard (nobody by default)
      */
     'block/closed_loop_support:myaddinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
-            'user' => CAP_ALLOW
         ),
         'clonepermissionsfrom' => 'moodle/my:manageblocks'
      ),
