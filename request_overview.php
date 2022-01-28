@@ -58,6 +58,10 @@ else{
     require_capability('block/closed_loop_support:myaddinstance', $context);
 }
 
+$ids = $DB->get_fieldset_select('block_closed_loop_support', 'id', 'explanationsend = 1');
+$PAGE->requires->js_call_amd('block_closed_loop_support/script_closed_loop_load_explanation', 
+       'init', [$ids]);
+
 $download = optional_param('download', '', PARAM_ALPHA);
 
 $table = new request_table('uniqueid');
@@ -84,6 +88,7 @@ foreach($unreadRequests as $unread){
 $table->set_sql('{block_closed_loop_support}.id, {block_closed_loop_support}.courseid,'
         . '{block_closed_loop_support}.userid, {block_closed_loop_support}.moduleid,'
         . '{block_closed_loop_support}.counter, {block_closed_loop_support}.timestamp,'
+        . '{block_closed_loop_support}.explanationtext, {block_closed_loop_support}.explanationsend,'
         . '{user}.firstname, {user}.lastname, {user}.username'
         , "{block_closed_loop_support}, {user}", "{user}.id = {block_closed_loop_support}.userid");
 

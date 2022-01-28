@@ -27,6 +27,52 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Get explanation for teacher to show in modal
+ * @global type $DB
+ * @param int $requestid
+ * @return string
+ */
+function block_closed_loop_support_get_explanation(int $requestid){
+    global $DB;
+    $request = $DB->get_record('block_closed_loop_support', ['id' => $requestid]);
+    $explanation = unserialize(base64_decode($request->explanationtext));
+    $user = $DB->get_record('user', ['id' => $request->userid]);
+    $cms = get_fast_modinfo($request->courseid);
+    $cm = $cms->get_cm($request->moduleid);
+    $modulename = $cm->get_formatted_name();
+    $coursename = get_course($request->courseid)->fullname;
+    
+    $output = get_string('expHeader', 'block_closed_loop_support') . "<br>";
+    $output .= $explanation;
+    $output .= "<hr>";
+    $output .= get_string('dataHeader', 'block_closed_loop_support') . "<br>";
+    $output .= get_string('user', 'block_closed_loop_support'). ": ". $user->firstname. " " . $user->lastname . "<br>";
+    $output .= get_string('module', 'block_closed_loop_support'). ": " . $modulename. "<br>";
+    $output .= get_string('course', 'block_closed_loop_support'). ": " .$coursename. "<br>";
+    return $output;
+
+}
+
+/**
+ * wirte explanation
+ * @global type $DB
+ * @param int $userid
+ * @param int $courseid
+ * @param int $moduleid
+ * @param int $counter
+ * @param string $explanation
+ */
+function block_closed_loop_support_write_explanation(int $userid, int $courseid, int $moduleid, int $counter, string $explanation){
+    global $DB;
+    $param = ['userid' => $userid,'courseid' => $courseid, 'moduleid' => $moduleid, 'counter' => $counter];
+    $DB->set_field('block_closed_loop_support', 
+            'explanationtext', base64_encode(serialize($explanation)), $param);
+    $DB->set_field('block_closed_loop_support', 
+            'explanationsend', 1, $param);
+}
+
+
+/**
  * Check if new requests exists for teacher in respect to teacher last request check
  * and return only the ids
  * 
@@ -170,16 +216,17 @@ function block_closed_loop_support_write_request(int $userid, int $courseid, int
     $eventparams = array('courseid' => $courseid, 'userid' =>$userid, 'contextid' => $contextModule->id);
     $event = \block_closed_loop_support\event\module_request_generated::create($eventparams);
     $event->trigger();
+    
+    return $counter;
 }
 
 /**
- * Delete responses
- * 
+ * delete responses
+ * @global type $DB
  * @param int $courseid
- * @param int $moduleids
- *
-*/
-function block_closed_loop_support_delete_response($courseid, $moduleids = NULL){
+ * @param array $moduleids
+ */
+function block_closed_loop_support_delete_response(int $courseid, array $moduleids = NULL){
     global $DB;
     $tableResponse = 'block_closed_loop_response';
     $requestids = [];
@@ -203,13 +250,13 @@ function block_closed_loop_support_delete_response($courseid, $moduleids = NULL)
 }
 
 /**
- * Set value for existing responses
+ * Set activity for existing responses
  * 
  * @param int $courseid
  * @param int $moduleids
  * @param int $value
 */
-function block_closed_loop_support_set_response($courseid, $moduleid = -1, $value = 0){
+function block_closed_loop_support_set_response_active($courseid, $moduleid = -1, $value = 0){
     global $DB;
     $tableResponse = 'block_closed_loop_response';
     if($moduleid === -1){
@@ -234,12 +281,12 @@ function block_closed_loop_support_create_response($courseid, $moduleids = NULL,
     if(is_null($moduleids)){
         $res = $DB->get_records('course_modules', ['course' => $courseid]);
         foreach($res as $r){
-            $data[] = ['courseid' => $courseid, 'moduleid' => $r->id, 'set' => $value];
+            $data[] = ['courseid' => $courseid, 'moduleid' => $r->id, 'setresponse' => $value];
         }
     }
     else{
         foreach($moduleids as $modid){
-            $data[] = ['courseid' => $courseid, 'moduleid' => $modid, 'set' => $value];
+            $data[] = ['courseid' => $courseid, 'moduleid' => $modid, 'setresponse' => $value];
         }
     }
 
@@ -253,12 +300,16 @@ function block_closed_loop_support_create_response($courseid, $moduleids = NULL,
  * @param int $moduleids
  * @param stdClass $formdata
 */
-function block_closed_loop_support_set_response_config($courseid, $moduleid, $formdata){
+function block_closed_loop_support_set_response($courseid, $moduleid, $formdata){
+        block_closed_loop_support_set_response_active($courseid, $moduleid, $formdata->response_active);
+        block_closed_loop_support_set_response_text($courseid, $moduleid, $formdata);
+}
+
+
+function block_closed_loop_support_set_response_text($courseid, $moduleid, $formdata){
+        
         global $DB, $CFG;
         $cond = ['courseid' => $courseid, 'moduleid' => $moduleid];
-        
-        //Separat setting in table outside of config (for easier handling in list etc.)
-        block_closed_loop_support_set_response($courseid, $moduleid, $formdata->response_active);
         
         $textCorrect = file_save_draft_area_files(
             $formdata->config_text['itemid'],
@@ -274,6 +325,7 @@ function block_closed_loop_support_set_response_config($courseid, $moduleid, $fo
         $DB->set_field('block_closed_loop_response', 'config', base64_encode(serialize($formdata)) , $cond);
 }
 
+
 /**
  * Get response config
  * 
@@ -287,10 +339,11 @@ function block_closed_loop_support_get_response_config($courseid, $moduleid){
         $rec = ($DB->get_record('block_closed_loop_response', 
                 ['courseid' => $courseid, 'moduleid' => $moduleid]))->config;
         $contentOriginal = unserialize(base64_decode($rec));
-        
+
         if(!$contentOriginal){
             return null;
         }
+        //Fix paths for plugin
         $correctText = file_rewrite_pluginfile_urls(
                 $contentOriginal->config_text['text'],
                 'pluginfile.php',
@@ -302,23 +355,63 @@ function block_closed_loop_support_get_response_config($courseid, $moduleid){
         $contentOriginal->config_text['text'] = $correctText;
         return $contentOriginal;
 }
+
+
+function block_closed_loop_support_get_response_content($courseid, $moduleid){
+    $responseContent = block_closed_loop_support_get_response_config($courseid, $moduleid)->config_text['text'];
+    if(is_null($responseContent)){
+        $responseContent = 'No response content found!';
+    }
+    return $responseContent;
+}
+
+function block_closed_loop_support_get_explanation_form($courseid, $moduleid){
+    global $DB, $PAGE, $CFG; //Important $CFG here!
+    require 'classes/explanation_form.php';
+    $context = context_course::instance($courseid);
+    $PAGE->set_context($context);
+    $explanation_forwarding = block_closed_loop_support_get_response_config($courseid, $moduleid)->explanation_forwarding;
+    $mform = new explanation_form($courseid, $moduleid, $explanation_forwarding, null);
+    ob_start();
+    $mform->display();
+    $output = ob_get_contents();
+    ob_end_clean();
+    return $output;
+}
+
 /*
- * Get response config content
+ * Get base dialog html
  * 
  * @param int $courseid
  * @param int $moduleids
- * @return array Config object content and pregenerated title
+ * @return html and its size for modal response dialog
 */
-function block_closed_loop_support_get_response_content($courseid, $moduleid){
-        global $DB;
+function block_closed_loop_support_get_modal_body($courseid, $moduleid){
+        global $DB, $CFG;
         $content = block_closed_loop_support_get_response_config($courseid, $moduleid);
-        $cms = get_fast_modinfo($courseid);
-        $cm = $cms->get_cm($moduleid);
-        $cm->get_formatted_name();
-        $title = 'Response for request<br>Course/Module:    ' . get_course($courseid)->fullname. 
-                '/'.$cm->get_formatted_name();
         $sizeBoolean = $content->response_size == 1 ? true : false;
-        return ['title' => $title,'content' => $content->config_text['text'], 'size' => $sizeBoolean];
+        $contentText = $content->config_text['text'];
+        if(is_null($contentText)){
+            $contentText = 'No response content found!';
+        }
+
+        
+        if($content->explanation_forwarding == 0){
+            $html = html_writer::start_div('', ['id' => 'content_modal_body_elem']);
+            $html .= $contentText;
+            $html .= html_writer::end_div();
+        }
+        else{
+            $html = html_writer::start_div('', ['id' => 'explanation_modal_body_elem']);
+            $html .= block_closed_loop_support_get_explanation_form($courseid, $moduleid);
+            $html .= html_writer::end_div();
+            $html .= "<hr>";
+            $html .= html_writer::start_div('', ['id' => 'content_modal_body_elem', 
+                'style' =>  $content->explanation_forwarding == 1 ? "visibility: visible" : "visibility: hidden"]);
+            $html .= $contentText;
+            $html .= html_writer::end_div();
+        }
+        return [  'modalbody' => $html, 'size' => $sizeBoolean, 'explanationForwarding' => $content->explanation_forwarding];
 }
 
 /*
@@ -356,7 +449,7 @@ function block_closed_loop_support_get_responselist_html($courseid) {
         $iconNotSet = '<i class="icon fa fa-times text-danger fa-fw " '
                 . 'title="Not set" aria-label="Not set"></i>';//$OUTPUT->pix_icon('i/invalid', 'Not set');
         
-        //TODO: more nice!
+
         $output = "";
         $sectMod = [];
         foreach ($dataResponse as $response){
@@ -400,6 +493,3 @@ function block_closed_loop_support_get_responselist_html($courseid) {
         $output .= html_writer::end_tag('ul');
         return $output;
 }
-
-
-

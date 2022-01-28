@@ -39,11 +39,13 @@ class request_table extends table_sql {
     function __construct($uniqueid) {
         parent::__construct($uniqueid);
         // Define the list of columns to show.
-        $columns = array('pic','username', 'firstname', 'lastname', 'courseid', 'moduleid', 'timestamp', 'counter');
+        $columns = array('pic','username', 'firstname', 'lastname', 'courseid', 
+            'moduleid', 'timestamp', 'counter', 'explanation');
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
-        $headers = array('Profile picture', 'Username', 'First name', 'Last name', 'Course', 'Course modul','Time', 'Counter');
+        $headers = array('Profile picture', 'Username', 'First name', 'Last name', 
+            'Course', 'Course modul', 'Time', 'Counter', 'Explanation');
         $this->define_headers($headers);
         $this->is_sortable = false;
         $this->is_collapsible = false;
@@ -124,6 +126,21 @@ class request_table extends table_sql {
     function col_courseid($values){
         $course = get_course($values->courseid);
         return $course->shortname;
+    }
+    
+    /**
+     * Show the explanation with button to modal
+     * @param object $values Contains object with all the values of record.
+     * @return $string Return shortname of courseid
+     */
+    function col_explanation($values){
+        global $OUTPUT;
+        $requestID = $values->id;
+        $disabled = $values->explanationsend == 0 ? 'disabled' : 'enabled';
+        $titleText = get_string($values->explanationsend == 1 ? 
+                'overviewExplainYes' : 'overviewExplainNo', 'block_closed_loop_support');
+        $data = ['requestID' => $requestID, 'disabled' => $disabled, 'titleText' => $titleText];
+        return $OUTPUT->render_from_template('block_closed_loop_support/showExplanation', $data);
     }
     
 

@@ -67,6 +67,12 @@
                     'Active', array('group' => 1), array(0, 1));
             $mform->addHelpButton('response_active', 'responseActive', 'block_closed_loop_support');
             
+            $mform->addElement('select', 'explanation_forwarding', 'Explanation for request', 
+                    array(0 => 'No', 1 => 'Optional', 2 => 'Mandatory'));
+            $mform->setDefault('explanation_forwarding', 1);
+            $mform->addHelpButton('explanation_forwarding', 'explanationForwarding', 'block_closed_loop_support');
+            
+
             $context = context_course::instance($this->courseid);
             $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $context);
             $mform->addElement(
@@ -79,7 +85,7 @@
             $mform->setType('config_text', PARAM_RAW);
             $mform->addHelpButton('config_text', 'responseContent', 'block_closed_loop_support');
             
-            $mform->addElement('select', 'response_size', 'Size of response dialog', array(0 => 'normal', 1 => 'big'));
+            $mform->addElement('select', 'response_size', 'Size of response dialog', array(0 => 'Normal', 1 => 'Big'));
             $mform->addHelpButton('response_size', 'responseSetSize', 'block_closed_loop_support');
             $this->add_action_buttons();
         }

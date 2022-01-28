@@ -58,6 +58,7 @@ class block_closed_loop_support extends block_base{
     public function get_content() {
         global $PAGE, $DB, $USER, $COURSE, $CFG, $OUTPUT;
         require_once(__DIR__ . '/locallib.php');
+
         $this->content = new stdClass();
         $startSetResponse = get_string('defResModule', 'block_closed_loop_support');
         

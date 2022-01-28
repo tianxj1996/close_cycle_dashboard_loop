@@ -27,7 +27,21 @@ import * as Templates from 'core/templates';
 import * as Notification from 'core/notification';
 import * as Ajax from 'core/ajax';
 import * as ModalFactory from 'core/modal_factory';
+import * as ModalEvents from 'core/modal_events';
+import * as Str from 'core/str';
 
+
+//The modal dialog object
+var modalObj;
+var courseidClicked;
+var moduleidClicked;
+var actualCounter;
+//var isMandatory;
+
+//Spinner for time during loading
+const spinner = '<p class="text-center">'
+        + '<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>'
+        + '</p>';
 
 /**
  * Ask for response and render in div element inside of block
@@ -35,47 +49,125 @@ import * as ModalFactory from 'core/modal_factory';
  * @param {Integer} moduleid
  */
 const renderResponse = (courseid, moduleid) => {
+
     Ajax.call([{
-        methodname: 'block_closed_loop_support_get_response_content',
+        methodname: 'block_closed_loop_support_get_modal_body',
         args: {
             courseid: courseid,
             moduleid: moduleid},
-        done: function(responseContent) {
-                ModalFactory.create({
-                    type: ModalFactory.types.CANCEL,
-                    title: responseContent.title,
-                    body: responseContent.content,
-                    large: responseContent.size,
-                    scrollable: true
-                })
-                .then(modal => {
-                    modal.setButtonText('cancel', 'Close');
-                    modal.show();
-                    return modal;
-                });
+        done: function(values) {
+                if(modalObj !== null){
+                    modalObj.setBody(values.modalbody);
+                    if(values.size){
+                        modalObj.setLarge();
+                    }
+                    else{
+                        modalObj.setSmall();
+                    }
+                }
+                else{
+                    Notification.exception(new Error('Failed to load modal dialog base'));
+                }
             },
         fail: Notification.exception
       }]);
 };
 
 /**
- * Click event
- * @param {Var} element
+ *
+ * @returns {undefined}
  */
-const buttonClickEvent = (element) =>{
+const loadModalDialog = () =>{
+    Str.get_string('responseTitle', 'block_closed_loop_support').then(function(title) {
+        ModalFactory.create({
+            type: ModalFactory.types.CANCEL,
+            title: title,
+            body: spinner,
+            large: false,
+            scrollable: true
+            })
+            .then(modal => {
+                modal.setButtonText('cancel', 'Close');
+                modal.show();
+                modalObj = modal;
+                modal.getRoot().on('click', '#id_submit_button', processSubmit);
+                modal.getRoot().on(ModalEvents.hidden, function(){
+                    //Destroy and not only hide
+                    modal.destroy();
+                });
+                writeRequest();
+        });
+    }).catch(function() {
+            Notification.exception(new Error('Failed to load HeaderTitle'));
+    });
+};
 
-    var stringIDs = element.target.getAttribute('id').replace('loopButton_','');
+/**
+ *
+ * @param {Object} e
+ * @returns {undefined}
+ */
+const processSubmit = (e) =>{
+    e.preventDefault();
+    var value = document.getElementById('id_explanation_textarea').value;
+    if(value.length === 0){
+        document.getElementById('no_empty_explanation_label').style = 'display: visible';
+    }
+    else
+    {
+        document.getElementById('content_modal_body_elem').style = 'display: visible';
+        Ajax.call([{
+            methodname: 'block_closed_loop_support_write_explanation',
+            args: {
+                courseid: courseidClicked,
+                cmid: moduleidClicked,
+                counter: actualCounter,
+                explanation: value},
+            done: explanationWasSend(),
+            fail: Notification.exception
+        }]);
+    }
+
+
+};
+
+
+const explanationWasSend = () =>{
+    Str.get_string('expThanks', 'block_closed_loop_support').then(function(thanks) {
+            document.getElementById('explain_heading_label').innerHTML = "<b>"+ thanks +"<b>";
+            var nodes = document.getElementById("explanation_modal_body_elem").getElementsByTagName('*');
+            for(var i = 0; i < nodes.length; i++){
+                nodes[i].disabled = true;
+            }
+    }).catch(function() {
+        Notification.exception(new Error('Failed to load HeaderTitle'));
+    });
+};
+
+const writeRequest = () =>{
+        Ajax.call([{
+            methodname: 'block_closed_loop_support_write_requests',
+            args: {
+                courseid: courseidClicked,
+                cmid: moduleidClicked},
+            done: function(counter) {
+                    actualCounter = counter;
+                    renderResponse(courseidClicked, moduleidClicked);
+                },
+            fail: Notification.exception
+        }]);
+};
+/**
+ * Click event
+ * @param {Var} event
+ */
+const buttonClickEvent = (event) =>{
+
+    var stringIDs = event.target.getAttribute('id').replace('loopButton_','');
     var splitString = stringIDs.split('_');
-     Ajax.call([{
-        methodname: 'block_closed_loop_support_write_requests',
-        args: {
-            courseid: splitString[0],
-            cmid: splitString[1]},
-        done: function() {
-                renderResponse(splitString[0], splitString[1]);
-            },
-        fail: Notification.exception
-      }]);
+    courseidClicked = splitString[0];
+    moduleidClicked = splitString[1];
+    loadModalDialog();
 };
 
 
@@ -84,7 +176,7 @@ const buttonClickEvent = (element) =>{
  * @param {Var} element
  * @param {Var} data
  */
-const renderTemplate = (element, data) => {
+const renderButtonTemplate = (element, data) => {
 
         Templates.renderForPromise('block_closed_loop_support/loopButton', data)
                 .then(({html, js}) => {
@@ -102,6 +194,7 @@ const renderTemplate = (element, data) => {
  */
 export const init = (requestButtons) => {
 
+
     for(let i = 0; i < Object.values(requestButtons).length; i++){
         const data = {
             courseid: Object.values(requestButtons)[i].courseid,
@@ -111,6 +204,7 @@ export const init = (requestButtons) => {
 
         /**
         General idea for placing button into 'module-<X>'
+        and mouseover effect
         adapted from moodle plugin 'Point of view - Feedback'
         developed by: Quentin Fombaron and Astor Bizard
         https://moodle.org/plugins/block_point_view
@@ -119,7 +213,7 @@ export const init = (requestButtons) => {
         var element = document.getElementById('module-' + data.moduleid);
         if(element)
         {
-            renderTemplate(element, data);
+            renderButtonTemplate(element, data);
         }
     }
 

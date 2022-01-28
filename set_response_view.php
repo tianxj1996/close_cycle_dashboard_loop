@@ -56,7 +56,7 @@ if($setresponse_form->is_cancelled()) {
     redirect($courseurl);
 } 
 else if ($fromform = $setresponse_form->get_data()) {
-    block_closed_loop_support_set_response_config($courseid, $moduleid, $fromform);
+    block_closed_loop_support_set_response($courseid, $moduleid, $fromform);
     redirect($courseurl);
 } 
 else {

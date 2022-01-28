@@ -31,6 +31,67 @@ require_once($CFG->libdir . '/externallib.php');
 class block_closed_loop_support_external_data extends external_api {
     
     /**
+    * Return html for modal dialog
+    *
+    * @return external_multiple_structure
+    */
+    public static function get_explanation_returns() {
+        return new external_value(PARAM_RAW, 'Explanation html');
+    }
+    
+    /**
+    * Parameters definition for get_modal_body
+    *
+    * @return external_value
+    */
+    public static function get_explanation_parameters() {
+        return new external_function_parameters(
+            array(
+                'requestid' => new external_value(PARAM_INT, 'id of original request of explanation', VALUE_REQUIRED)
+            )
+        );
+    }
+    
+    /**
+    * get_explanation
+    */
+    public static function get_explanation(int $requestid) {
+        require_once(__DIR__ . '/locallib.php');
+        return block_closed_loop_support_get_explanation($requestid);
+    }
+
+    /**
+    * Parameters definition for write_explanation
+    */
+    public static function write_explanation_parameters() {
+        return new external_function_parameters(
+            array(
+                'courseid' => new external_value(PARAM_INT, 'id of course', VALUE_REQUIRED),
+                'cmid' => new external_value(PARAM_INT, 'id of course module', VALUE_REQUIRED),
+                'counter' => new external_value(PARAM_INT, 'counter of request', VALUE_REQUIRED),
+                'explanation' => new external_value(PARAM_RAW, 'text of explanation', VALUE_REQUIRED)
+            )
+        );
+    }
+    
+    /**
+    * Returns a log message
+    *
+    * @return write_explanation
+    */
+    public static function write_explanation_returns() {
+        return new external_value(PARAM_TEXT, 'Placeholder');
+    }
+    
+    
+    public static function write_explanation(int $courseid, int $cmid, int $counter, string $explanation){
+        global $USER;
+        require_once(__DIR__ . '/locallib.php');
+        return block_closed_loop_support_write_explanation($USER->id, $courseid, $cmid, $counter, $explanation);
+    }
+    
+    
+    /**
     * Parameters definition for update_db (user not required here)
     */
     public static function write_requests_parameters() {
@@ -48,7 +109,7 @@ class block_closed_loop_support_external_data extends external_api {
     * @return external_description
     */
     public static function write_requests_returns() {
-        return new external_value(PARAM_TEXT, 'Placeholder');
+        return new external_value(PARAM_INT, 'Counter number');
     }
     
     
@@ -95,27 +156,27 @@ class block_closed_loop_support_external_data extends external_api {
     }
     
     /**
-    * Return title and content for get_response_content
+    * Return base html for modal dialog
     *
     * @return external_multiple_structure
     */
-    public static function get_response_content_returns() {
+    public static function get_modal_body_returns() {
         return 
             new external_single_structure(
                 [
-                    'title' => new external_value(PARAM_RAW, 'Request title'),
-                    'content' => new external_value(PARAM_RAW, 'Request content'),
+                    'modalbody' => new external_value(PARAM_RAW, 'Html for body'),
                     'size' => new external_value(PARAM_BOOL, 'Dialog size (true == large)'),
+                    'explanationForwarding' => new external_value(PARAM_INT, 'Explanation forwarding is mandatory, optional or off')
                 ]
             );
     }
     
     /**
-    * Parameters definition for get_response_content
+    * Parameters definition for get_modal_body
     *
     * @return external_value
     */
-    public static function get_response_content_parameters() {
+    public static function get_modal_body_parameters() {
         return new external_function_parameters(
             array(
                 'courseid' => new external_value(PARAM_INT, 'id of course', VALUE_REQUIRED),
@@ -127,9 +188,9 @@ class block_closed_loop_support_external_data extends external_api {
     /**
     * get_response_content
     */
-    public static function get_response_content(int $courseid, int $moduleid) {
+    public static function get_modal_body(int $courseid, int $moduleid) {
         require_once(__DIR__ . '/locallib.php');
-        return block_closed_loop_support_get_response_content($courseid, $moduleid);
+        return block_closed_loop_support_get_modal_body($courseid, $moduleid);
     }
     
     /**

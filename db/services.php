@@ -42,9 +42,9 @@ $functions = array(
         'type'        => 'read',
         'ajax'        => true
     ),
-    'block_closed_loop_support_get_response_content' => array(
+    'block_closed_loop_support_get_modal_body' => array(
         'classname'   => 'block_closed_loop_support_external_data',
-        'methodname'  => 'get_response_content',
+        'methodname'  => 'get_modal_body',
         'classpath'   => 'blocks/closed_loop_support/externallib.php',
         'description' => 'Get content of response for student',
         'type'        => 'read',
@@ -55,6 +55,22 @@ $functions = array(
         'methodname'  => 'get_responselist_html',
         'classpath'   => 'blocks/closed_loop_support/externallib.php',
         'description' => 'Get response-list html element',
+        'type'        => 'read',
+        'ajax'        => true
+    ),
+    'block_closed_loop_support_write_explanation' => array(
+        'classname'   => 'block_closed_loop_support_external_data',
+        'methodname'  => 'write_explanation',
+        'classpath'   => 'blocks/closed_loop_support/externallib.php',
+        'description' => 'Write user explanation for request',
+        'type'        => 'write',
+        'ajax'        => true
+    ),
+    'block_closed_loop_support_get_explanation' => array(
+        'classname'   => 'block_closed_loop_support_external_data',
+        'methodname'  => 'get_explanation',
+        'classpath'   => 'blocks/closed_loop_support/externallib.php',
+        'description' => 'Ge explanation to show in modal',
         'type'        => 'read',
         'ajax'        => true
     )

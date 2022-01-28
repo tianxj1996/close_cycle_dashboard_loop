@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/closed_loop_support/db" VERSION="20220112" COMMENT="XMLDB file for Moodle blocks/closed_loop_support"
+<XMLDB PATH="blocks/closed_loop_support/db" VERSION="20220126" COMMENT="XMLDB file for Moodle blocks/closed_loop_support"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -12,6 +12,8 @@
         <FIELD NAME="moduleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The module-id inside a course"/>
         <FIELD NAME="counter" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Counts the requests for each entry. Only counts &amp;gt;= 1 are listed"/>
         <FIELD NAME="timestamp" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="explanationtext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The text of a (maybe optional) explanation for request"/>
+        <FIELD NAME="explanationsend" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Boolean if explanation was send by user"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

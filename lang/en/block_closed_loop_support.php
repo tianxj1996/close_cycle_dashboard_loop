@@ -48,6 +48,24 @@ $string['responseContent'] = 'Editor for content definition';
 $string['responseContent_help'] = 'Editor for defining of content of the response (e.g. text, pictures, links to ressources or external websites)';
 $string['responseSetSize'] = 'Define size of response dialog';
 $string['responseSetSize_help'] = 'Define the default size of the output dialog. Size only visible in the real dialog, not here.';
+$string['explanationForwarding'] = 'Explanation for request behaviour';
+$string['explanationForwarding_help'] = 'Define if an explanation for a request is required. Options:<br>No = No explanation possible<br>'
+        . 'Optional = Is possible but not required to view response content<br>Mandatory = Required to view response content';
+$string['explainHeading'] = '{$a} explanation for help request.';
+$string['explainHeading2'] = 'Further support information are visible after submit of explanation!';
+$string['explainFormGeneral'] = 'Explain';
+$string['explainFormGeneral_help'] = 'Explanation will be forwarded to course responsible';
+$string['missingExplanation'] = 'No empty explanation aloud for submit';
+$string['responseTitle'] = 'Help response';
+$string['expThanks'] = 'Thank you! Your explanation has been forwarded.';
+$string['overviewExplainYes'] = 'User provided a explanation for request';
+$string['overviewExplainNo'] = 'User provided no explanation for request';
+$string['explainShowTitle'] = 'User explanation for request';
+$string['module'] = 'Module';
+$string['course'] = 'Course';
+$string['user'] = 'User';
+$string['expHeader'] = '<h6>Explanation text</h6>';
+$string['dataHeader'] = '<h6>Data</h6>';
 
 $string['closed_loop_support:access_requests'] = 'Overview about closed loop requests';
 $string['closed_loop_support:generate_requests'] = 'Generate a closed loop request for a course-module';
