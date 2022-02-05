@@ -44,7 +44,7 @@ class block_closed_loop_support extends block_base{
     public function applicable_formats() {
         return array(
                 'admin' => false,
-                'site-index' => true,
+                'site-index' => false,
                 'course-view' => true,
                 'mod' => false,
                 'my' => true
@@ -108,8 +108,10 @@ class block_closed_loop_support extends block_base{
                     $this->content->text = $startSetResponse . get_string('defMissingCapabilitys', 'block_closed_loop_support');
                 }
             }
+            return  $this->content;
         }
-        return  $this->content;
+        //Not visible in all other cases!
+        return null;
     }
     
     /**
