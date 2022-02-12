@@ -32,16 +32,44 @@ $observers = array(
      */
     array(
         'eventname' => '\block_closed_loop_support\event\course_requests_viewed',
-        'callback' => 'block_closed_loop_support_observer::viewed',
+        'callback' => 'block_closed_loop_support_observer::requests_viewed',
         'internal' => false
     ),
     
-     /**
-     * New event-type for request generated
+    /**
+     * New event-type for requests explanation viewed
      */
     array(
-        'eventname' => '\block_closed_loop_support\event\module_request_generated',
-        'callback' => 'block_closed_loop_support_observer::request_generated',
+        'eventname' => '\block_closed_loop_support\event\request_explanation_viewed',
+        'callback' => 'block_closed_loop_support_observer::explanation_viewed',
+        'internal' => false
+    ),
+    
+    /**
+     * New event-type for request explanation viewed
+     */
+    array(
+        'eventname' => '\block_closed_loop_support\event\request_explanation_viewed',
+        'callback' => 'block_closed_loop_support_observer::explanation_viewed',
+        'internal' => false
+    ),
+    
+    
+    /**
+     * New event-type for request explanation submitted
+     */
+    array(
+        'eventname' => '\block_closed_loop_support\event\request_explanation_submitted',
+        'callback' => 'block_closed_loop_support_observer::explanation_submitted',
+        'internal' => false
+    ),
+    
+    /**
+     * New event-type for module response updated
+     */
+    array(
+        'eventname' => '\block_closed_loop_support\event\module_response_updated',
+        'callback' => 'block_closed_loop_support_observer::response_updated',
         'internal' => false
     ),
     

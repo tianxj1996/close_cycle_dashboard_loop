@@ -29,17 +29,41 @@ class block_closed_loop_support_observer{
      * Process course_requests_viewed event
      * @param \block_closed_loop_support\event\course_requests_viewed $event 
      */
-    public static function viewed(\block_closed_loop_support\event\course_requests_viewed $event){
+    public static function requests_viewed(\block_closed_loop_support\event\course_requests_viewed $event){
         require_once(__DIR__ . '/../locallib.php');
         
         block_closed_loop_support_set_requests_viewed($event->userid, $event->courseid);
     }
     
-     /**
+    /**
      * Process module_request_generated event (actually only placeholder cause it is required for definition of new event)
      * @param \block_closed_loop_support\event\module_request_generated $event 
      */
     public static function request_generated(\block_closed_loop_support\event\module_request_generated $event){
+        return;
+    }
+    
+    /**
+     * Process request_explanation_viewed event (actually only placeholder cause it is required for definition of new event)
+     * @param \block_closed_loop_support\event\request_explanation_viewed $event 
+     */
+    public static function explanation_viewed(\block_closed_loop_support\event\request_explanation_viewed $event){
+        return;
+    }
+    
+    /**
+     * Process request_explanation_submitted event (actually only placeholder cause it is required for definition of new event)
+     * @param \block_closed_loop_support\event\request_explanation_submitted $event 
+     */
+    public static function explanation_submitted(\block_closed_loop_support\event\request_explanation_submitted $event){
+        return;
+    }
+    
+        /**
+     * Process module_response_updated event (actually only placeholder cause it is required for definition of new event)
+     * @param \block_closed_loop_support\event\module_response_updated $event 
+     */
+    public static function response_updated(\block_closed_loop_support\event\module_response_updated $event){
         return;
     }
     

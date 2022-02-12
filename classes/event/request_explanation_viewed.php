@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * event class module_request_generated
+ * event class request_explanation_viewed
  *
  * @package    block_closed_loop_support
  * @copyright  2022 Rene Hilgemann
@@ -27,7 +27,7 @@ namespace block_closed_loop_support\event;
 defined('MOODLE_INTERNAL') || die();
 
 
-class module_request_generated extends \core\event\base {
+class request_explanation_viewed extends \core\event\base {
 
     /**
      * Init method.
@@ -39,23 +39,23 @@ class module_request_generated extends \core\event\base {
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
 
+
     /**
      * Returns description of what happened.
      *
      * @return string
      */
     public function get_description() {
-        return "The User with id '{$this->data['userid']}' asked for support for the moduleid '{$this->contextinstanceid}'"
-        . " in the course with the id '{$this->data['courseid']}'.";
+        return "The user with id '$this->userid' viewed the explanation for the request with id '{$this->data['other']}'.";
     }
 
+    
     /**
      * Return localised event name.
      *
      * @return string
      */
     public static function get_name() {
-        return get_string('eventmoduleRequstGenerated', 'block_closed_loop_support');
+        return get_string('eventrequestexplanationviewed', 'block_closed_loop_support');
     }
-
 }

@@ -47,10 +47,10 @@ class course_requests_viewed extends \core\event\base {
      */
     public function get_description() {
         if($this->courseid < 0){
-            return "The teacher with id '$this->userid' viewed the requests for all courses he/she is responsible for'.";
+            return "The user with id '$this->userid' viewed the requests for all courses he/she is responsible for'.";
         }
         else{
-            return "The teacher with id '$this->userid' viewed the requests for the course with id '$this->courseid'.";
+            return "The user with id '$this->userid' viewed the requests for the course with id '$this->courseid'.";
         }
     }
 

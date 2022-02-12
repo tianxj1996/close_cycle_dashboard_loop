@@ -49,6 +49,13 @@ function block_closed_loop_support_get_explanation(int $requestid){
     $output .= get_string('user', 'block_closed_loop_support'). ": ". $user->firstname. " " . $user->lastname . "<br>";
     $output .= get_string('module', 'block_closed_loop_support'). ": " . $modulename. "<br>";
     $output .= get_string('course', 'block_closed_loop_support'). ": " .$coursename. "<br>";
+    
+    // Trigger event
+    $context = get_context_instance(CONTEXT_MODULE, $request->moduleid);
+    $eventparams = array('other' => $requestid, 'userid' => $USER->id, 'contextid' => $context->id);
+    $event = \block_closed_loop_support\event\request_explanation_viewed::create($eventparams);
+    $event->trigger();
+    
     return $output;
 
 }
@@ -69,6 +76,16 @@ function block_closed_loop_support_write_explanation(int $userid, int $courseid,
             'explanationtext', base64_encode(serialize($explanation)), $param);
     $DB->set_field('block_closed_loop_support', 
             'explanationsend', 1, $param);
+    
+    
+    
+    // Trigger event
+    $context = get_context_instance(CONTEXT_MODULE, $moduleid);
+    $requestid = $DB->get_field('block_closed_loop_support', 'id', $param);
+    $eventparams = array('other' => $requestid, 'userid' => $USER->id, 'contextid' => $context->id);
+    $event = \block_closed_loop_support\event\request_explanation_submitted::create($eventparams);
+    $event->trigger();
+    
 }
 
 
@@ -301,8 +318,16 @@ function block_closed_loop_support_create_response($courseid, $moduleids = NULL,
  * @param stdClass $formdata
 */
 function block_closed_loop_support_set_response($courseid, $moduleid, $formdata){
+        global $USER;
         block_closed_loop_support_set_response_active($courseid, $moduleid, $formdata->response_active);
         block_closed_loop_support_set_response_text($courseid, $moduleid, $formdata);
+        
+        // Trigger event
+        $context = get_context_instance(CONTEXT_MODULE, $moduleid);
+        $eventparams = array('courseid' => $courseid, 
+            'userid' => $USER->id, 'contextid' => $context->id);
+        $event = \block_closed_loop_support\event\module_response_updated::create($eventparams);
+        $event->trigger();
 }
 
 
