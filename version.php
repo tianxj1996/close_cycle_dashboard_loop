@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'block_closed_loop_support';
-$plugin->version   = 2022021205; 
+$plugin->version   = 2022021206; 
 $plugin->requires  = 2021051704;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->release = 'v3.11-r1'; //Release for Moodle 3.11 Stable
