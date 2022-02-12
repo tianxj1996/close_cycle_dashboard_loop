@@ -88,5 +88,13 @@ $observers = array(
         'eventname' => '\core\event\course_module_deleted',
         'callback' => 'block_closed_loop_support_observer::module_deleted',
         'internal' => false
+    ),
+     /**
+     * For processing existing event \core\event\course_deleted
+     */
+    array(
+        'eventname' => '\core\event\course_deleted',
+        'callback' => 'block_closed_loop_support_observer::course_deleted',
+        'internal' => false
     )
 );

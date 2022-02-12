@@ -85,5 +85,14 @@ class block_closed_loop_support_observer{
         block_closed_loop_support_delete_response($event->courseid, [$event->objectid]);
     }
     
+         /**
+     * Process course_module_deleted event
+     * @param \core\event\course_module_deleted $event 
+     */
+    public static function course_deleted(\core\event\course_deleted $event){
+        require_once(__DIR__ . '/../locallib.php');
+        block_closed_loop_support_delete_response($event->courseid);
+    }
+    
 
 }
