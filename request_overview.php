@@ -85,12 +85,21 @@ foreach($unreadRequests as $unread){
     array_push($table->unreadRequests, $unread->requestid);
 }
 
+
+if($courseid == -1){
+    $sqlWhere = "{user}.id = {block_closed_loop_support}.userid";
+}
+else{
+    $sqlWhere = "{user}.id = {block_closed_loop_support}.userid AND "
+            . "{block_closed_loop_support}.courseid = $courseid";
+}
+
 $table->set_sql('{block_closed_loop_support}.id, {block_closed_loop_support}.courseid,'
         . '{block_closed_loop_support}.userid, {block_closed_loop_support}.moduleid,'
         . '{block_closed_loop_support}.counter, {block_closed_loop_support}.timestamp,'
         . '{block_closed_loop_support}.explanationtext, {block_closed_loop_support}.explanationsend,'
         . '{user}.firstname, {user}.lastname, {user}.username'
-        , "{block_closed_loop_support}, {user}", "{user}.id = {block_closed_loop_support}.userid");
+        , "{block_closed_loop_support}, {user}", $sqlWhere);
 
 $table->define_baseurl("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters);
 $table->out(20, true);
