@@ -15,7 +15,7 @@ Release v1.6.3
 /* Button position */
 .block_closed_loop_support.button-container .loopButton {
     position: absolute;
-    right:-18px;
+    right:-3px;
     top: 0;
 }
 
