@@ -32,7 +32,7 @@ Release v1.6.3
 
 /* Scrollable list*/
 .scrollListUL{
-    height: 500px;
+    max-height: 500px;
     overflow:hidden;
     overflow-y:auto;
     overflow-x:auto;
