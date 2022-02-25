@@ -45,7 +45,7 @@ class request_table extends table_sql {
 
         // Define the titles of columns to show in header.
         $headers = array('Profile picture', 'Username', 'First name', 'Last name', 
-            'Course', 'Course modul', 'Time', 'Counter', 'Explanation');
+            'Course', 'Course module', 'Time', 'Counter', 'Explanation');
         $this->define_headers($headers);
         $this->is_sortable = false;
         $this->is_collapsible = false;

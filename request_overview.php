@@ -101,7 +101,7 @@ $table->set_sql('{block_closed_loop_support}.id, {block_closed_loop_support}.cou
         . '{user}.firstname, {user}.lastname, {user}.username'
         , "{block_closed_loop_support}, {user}", $sqlWhere);
 
-$table->define_baseurl("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters);
+$table->define_baseurl(new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters));
 $table->out(20, true);
 
 if (!$table->is_downloading()) {
