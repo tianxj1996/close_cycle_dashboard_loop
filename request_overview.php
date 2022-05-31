@@ -32,6 +32,8 @@ require "classes/request_table.php";
 require_login();
 
 $courseid = optional_param('courseid', -1, PARAM_INT);
+$newRequest = optional_param('newrequest', -1, PARAM_INT);
+$newReply = optional_param('newreply', -1, PARAM_INT);
 if($courseid !== -1){
     $context = context_course::instance($courseid);
     $course = get_course($courseid);
@@ -50,9 +52,14 @@ $parameters = array (
         'courseid'   => $courseid
 );
 
-$PAGE->set_url(new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters));
+$url = new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters);
+$PAGE->set_url($url);
+$userid = $USER->id;
 if($courseid !== -1){
-    require_capability('block/closed_loop_support:access_requests', $context);
+    if (has_capability('block/closed_loop_support:access_requests', $context)) {
+        $userid = 0;
+    }
+    //require_capability('block/closed_loop_support:access_requests', $context);
 }
 else{
     require_capability('block/closed_loop_support:myaddinstance', $context);
@@ -81,17 +88,38 @@ if (!$table->is_downloading()) {
 
 $conditions = array('userid' => $USER->id, 'courseid' => $courseid);
 $unreadRequests = block_closed_loop_support_get_new_requests_teacher_ids($USER->id, $courseid);
+$unreadReplies = block_closed_loop_support_get_new_replies_ids($USER->id, $courseid);
 foreach($unreadRequests as $unread){
     array_push($table->unreadRequests, $unread->requestid);
+}
+foreach($unreadReplies as $unread){
+    array_push($table->unreadReplies, $unread->requestid);
 }
 
 
 if($courseid == -1){
-    $sqlWhere = "{user}.id = {block_closed_loop_support}.userid";
+    $sqlWhere = "{user}.id = {block_closed_loop_support}.userid AND {block_closed_loop_support}.pid = 0";
 }
 else{
-    $sqlWhere = "{user}.id = {block_closed_loop_support}.userid AND "
+    $sqlWhere = "{user}.id = {block_closed_loop_support}.userid AND {block_closed_loop_support}.pid = 0 AND "
             . "{block_closed_loop_support}.courseid = $courseid";
+    if ($userid) {
+        $sqlWhere .= " AND {block_closed_loop_support}.userid = $userid";
+    }
+}
+if ($newRequest != -1) {
+    if (empty($table->unreadRequests)) {
+        $sqlWhere .= " AND {block_closed_loop_support}.id = -1";
+    } else {
+        $sqlWhere .= " AND {block_closed_loop_support}.id in (" . implode(',', $table->unreadRequests) . ")";
+    }
+}
+if ($newReply != -1) {
+    if (empty($table->unreadReplies)) {
+        $sqlWhere .= " AND {block_closed_loop_support}.id = -1";
+    } else {
+        $sqlWhere .= " AND {block_closed_loop_support}.id in (" . implode(',', $table->unreadReplies) . ")";
+    }
 }
 
 $table->set_sql('{block_closed_loop_support}.id, {block_closed_loop_support}.courseid,'
@@ -102,6 +130,7 @@ $table->set_sql('{block_closed_loop_support}.id, {block_closed_loop_support}.cou
         , "{block_closed_loop_support}, {user}", $sqlWhere);
 
 $table->define_baseurl(new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", $parameters));
+echo '<div><a href="' . $url . '" class="btn btn-primary mr-1">Show all</a><a href="' . $url . '&newrequest=1" class="btn btn-warning mr-1">Show new request</a><a href="' . $url . '&newreply=1" class="btn btn-danger">Show new reply</a></div>';
 $table->out(20, true);
 
 if (!$table->is_downloading()) {
