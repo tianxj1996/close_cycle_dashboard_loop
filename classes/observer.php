@@ -32,7 +32,7 @@ class block_closed_loop_support_observer{
     public static function requests_viewed(\block_closed_loop_support\event\course_requests_viewed $event){
         require_once(__DIR__ . '/../locallib.php');
         
-        block_closed_loop_support_set_requests_viewed($event->userid, $event->courseid);
+        //block_closed_loop_support_set_requests_viewed($event->userid, $event->courseid);
     }
     
     /**
