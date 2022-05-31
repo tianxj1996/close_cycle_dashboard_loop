@@ -61,6 +61,14 @@ class block_closed_loop_support_external_data extends external_api {
     }
 
     /**
+     * get_explanation
+     */
+    public static function del_request(int $requestid) {
+        require_once(__DIR__ . '/locallib.php');
+        return block_closed_loop_support_get_explanation($requestid);
+    }
+
+    /**
     * Parameters definition for write_explanation
     */
     public static function write_explanation_parameters() {
@@ -136,7 +144,17 @@ class block_closed_loop_support_external_data extends external_api {
     public static function read_requests(int $courseid) {
         global $USER;
         require_once(__DIR__ . '/locallib.php');
-        return block_closed_loop_support_get_new_requests_teacher($USER->id, $courseid);
+        if($courseid !== -1){
+            $context = context_course::instance($courseid);
+        }
+        else
+        {
+            //In this case the dialog has to be started from dashboard and the user
+            //needs block/closed_loop_support:myaddinstance for its own usercontext
+            $context = context_user::instance($USER->id);
+        }
+        $isTeacher = has_capability('block/closed_loop_support:access_requests', $context);
+        return block_closed_loop_support_get_new_requests_teacher($USER->id, $courseid, $isTeacher);
     }
     
     /**
