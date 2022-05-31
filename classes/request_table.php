@@ -29,6 +29,7 @@ class request_table extends table_sql {
 
 
     public $unreadRequests = [];
+    public $unreadReplies = [];
     public $courseid = -1;
     
     /**
@@ -78,6 +79,8 @@ class request_table extends table_sql {
     function get_row_class($row) {
         if(in_array($row->id, $this->unreadRequests)){
             return 'cell_color';
+        } elseif(in_array($row->id, $this->unreadReplies)){
+            return 'cell_color1';
         }
         else{
             return '';
