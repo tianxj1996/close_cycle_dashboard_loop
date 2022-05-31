@@ -29,6 +29,10 @@ Release v1.6.3
     color: orange;
     font-weight: bold;
 }
+.cell_color1{
+    color: #0070C0;
+    font-weight: bold;
+}
 
 /* Scrollable list*/
 .scrollListUL{
