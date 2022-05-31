@@ -113,6 +113,20 @@ function block_closed_loop_support_get_new_requests_teacher_ids(int $userid, int
     }
 }
 
+function block_closed_loop_support_get_new_replies_ids(int $userid, int $courseid = -1){
+    global $DB;
+
+    $tableReply = 'block_closed_loop_reply';
+    $conditions = array('userid' => $userid, 'courseid' => $courseid);
+    if($courseid === -1){
+
+        return $DB->get_records($tableReply, ['userid' => $userid]);
+    }
+    else{
+        return $DB->get_records($tableReply, $conditions);
+    }
+}
+
 /**
  * Check if new requests exists for teacher and generate values for mustache
  * 
@@ -121,10 +135,11 @@ function block_closed_loop_support_get_new_requests_teacher_ids(int $userid, int
  * @return array mustache-values
  *
 */
-function block_closed_loop_support_get_new_requests_teacher(int $userid, int $courseid = -1){
+function block_closed_loop_support_get_new_requests_teacher(int $userid, int $courseid = -1, $isTeacher = true){
     global $DB, $CFG;
     
     $tableTeacher = 'block_closed_loop_teacher';
+    $tableReply = 'block_closed_loop_reply';
     $conditions = array('userid' => $userid, 'courseid' => $courseid);
     $counter = 0;
     if($courseid === -1){
@@ -144,6 +159,7 @@ function block_closed_loop_support_get_new_requests_teacher(int $userid, int $co
     }
     else{
         $text = get_string('noRequest', 'block_closed_loop_support');
+        //$text = get_string('newRequest', 'block_closed_loop_support');
         $btnClass = "btn-primary";
     }
     
@@ -154,6 +170,25 @@ function block_closed_loop_support_get_new_requests_teacher(int $userid, int $co
         $text2 = get_string('forCourse', 'block_closed_loop_support');
     }
     $text .= " " . $text2;
+
+    $condition = [];
+    if ($courseid !== -1) {
+        $condition['courseid'] = $courseid;
+    }
+    if (!$isTeacher) {
+        $condition['userid'] = $userid;
+    }
+    $replyCounter = count($DB->get_records($tableReply, $condition, '', 'distinct requestid'));
+    if($replyCounter > 1){
+        $text1 = "There are {$replyCounter} new replies";
+    }
+    else if ($replyCounter === 1){
+        $text1 = 'There is a one new reply';
+    }
+    else{
+        $text1 = 'No new reply';
+    }
+    $text .= " " . $text1 . " {$text2}";
     
     $url = new moodle_url("{$CFG->wwwroot}/blocks/closed_loop_support/request_overview.php", 
                     array('courseid'=> $courseid));
@@ -263,6 +298,7 @@ function block_closed_loop_support_delete_response(int $courseid, array $modulei
     foreach($requestids as $rid){
         $DB->delete_records('block_closed_loop_teacher', ['requestid' => $rid->id]);
         $DB->delete_records('block_closed_loop_support', ['id' => $rid->id]);
+        $DB->delete_records('block_closed_loop_reply', ['requestid' => $rid->id]);
     }
 }
 
