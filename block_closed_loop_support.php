@@ -71,7 +71,8 @@ class block_closed_loop_support extends block_base{
             }
             
             if(!$this->page->user_is_editing()){
-                $data = block_closed_loop_support_get_new_requests_teacher($USER->id, -1);
+                $isTeacher = has_capability('block/closed_loop_support:access_requests', $this->context);
+                $data = block_closed_loop_support_get_new_requests_teacher($USER->id, -1, $isTeacher);
                 $this->content->text = 
                         $OUTPUT->render_from_template('block_closed_loop_support/requestLink', $data);
             }
@@ -83,17 +84,18 @@ class block_closed_loop_support extends block_base{
         
         //Second case: We are on a course page
         if ($this->page->context->contextlevel == CONTEXT_COURSE && $isNotsiteindex){
-            
+
             if(!$this->page->user_is_editing()){
-                
-                if(has_capability('block/closed_loop_support:access_requests', $this->context)){
-                    $data = block_closed_loop_support_get_new_requests_teacher($USER->id, $COURSE->id);
+
+                //if(has_capability('block/closed_loop_support:access_requests', $this->context)){
+                    $isTeacher = has_capability('block/closed_loop_support:access_requests', $this->context);
+                    $data = block_closed_loop_support_get_new_requests_teacher($USER->id, $COURSE->id, $isTeacher);
                     $this->content->text = 
                         $OUTPUT->render_from_template('block_closed_loop_support/requestLink', $data);
-                }
+                /*}
                 else{
                     return null;
-                }
+                }*/
             }
             else{
                 if(has_capability('block/closed_loop_support:add_response', $this->context) 
