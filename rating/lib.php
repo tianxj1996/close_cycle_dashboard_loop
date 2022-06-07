@@ -1147,7 +1147,7 @@ class rating_manager {
         // Doing this check here rather than within rating_manager::get_ratings() so we can return a error response.
         $pluginpermissionsarray = $this->get_plugin_permissions_array($context->id, $component, $ratingarea);
 
-        if (0 && !$pluginpermissionsarray['rate']) {
+        if (!$pluginpermissionsarray['rate'] && $ratingarea != 'post_stu') {
             $result->error = 'ratepermissiondenied';
             return $result;
         } else {
