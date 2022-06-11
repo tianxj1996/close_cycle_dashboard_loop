@@ -80,7 +80,7 @@ $output = get_string('expHeader', 'block_closed_loop_support') . "<br>";
 $output .= $explanation;
 foreach ($list as $val) {
     $explanationtext = unserialize(base64_decode($val->explanationtext));
-    $output .= "<div><span>" . $val->username . " reply: </span><span>{$explanationtext}</span></div>";
+    $output .= "<div><span>" . $val->username . " reply: </span><br><span>{$explanationtext}</span></div>";
 }
 $output .= "<hr>";
 $output .= get_string('dataHeader', 'block_closed_loop_support') . "<br>";
