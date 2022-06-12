@@ -93,8 +93,32 @@ require 'classes/reply_explanation_form.php';
 $mform = new reply_explanation_form($requestid, 'request_reply.php');
 $mform->display();
 
+$role = $DB->get_record('role', array('shortname' => 'editingteacher'));
+$context = context_course::instance($record->courseid);
+$teachers = get_role_users($role->id, $context);
+
 $tableReply = 'block_closed_loop_reply';
-$DB->delete_records($tableReply, ['requestid' => $requestid, 'userid' => $userid]);
+$condition = ['requestid' => $requestid, 'userid' => $USER->id];
+$DB->delete_records($tableReply, $condition);
+/*if ($userid) {
+    $condition = ['requestid' => $requestid, 'userid' => $USER->id];
+    $DB->delete_records($tableReply, $condition);
+} else {
+    $teacher_ids = [];
+    foreach ($teachers as $teacher) {
+        $teacher_ids[] = $teacher->id;
+    }
+    if ($teacher_ids) {
+        $teacher_ids = implode(',', $teacher_ids);
+        $sqlWhere = "requestid = $requestid AND userid NOT IN ($teacher_ids)";
+        $sql = "SELECT id FROM {block_closed_loop_reply} WHERE $sqlWhere";
+        $list = $DB->get_records_sql($sql, null, 0, 30);
+        if (!$list) {
+            $condition = ['requestid' => $requestid, 'userid' => $USER->id];
+            $DB->delete_records($tableReply, $condition);
+        }
+    }
+}*/
 
 echo $OUTPUT->footer();
 

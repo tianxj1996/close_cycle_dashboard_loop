@@ -17,6 +17,7 @@ $record = $DB->get_record('block_closed_loop_support', ['id' => $requestid]);
 if (!$record) {
     exit('request not exist');
 }
+
 $insert = [
     'courseid' => $record->courseid,
     'userid' => $USER->id,
@@ -29,10 +30,25 @@ $insert = [
 ];
 $DB->insert_record('block_closed_loop_support', $insert);
 
-$insert = [
-    'courseid' => $record->courseid,
-    'requestid' => $requestid,
-    'userid' => $record->userid,
-];
-$DB->insert_record('block_closed_loop_reply', $insert);
+$role = $DB->get_record('role', array('shortname' => 'editingteacher'));
+$context = context_course::instance($record->courseid);
+$teachers = get_role_users($role->id, $context);
+foreach ($teachers as $teacher) {
+    if ($teacher->id != $record->userid) {
+        $insert = [
+            'courseid' => $record->courseid,
+            'requestid' => $requestid,
+            'userid' => $teacher->id,
+        ];
+        $DB->insert_record('block_closed_loop_reply', $insert);
+    }
+}
+if ($USER->id != $record->userid) {
+    $insert = [
+        'courseid' => $record->courseid,
+        'requestid' => $requestid,
+        'userid' => $record->userid,
+    ];
+    $DB->insert_record('block_closed_loop_reply', $insert);
+}
 header("Location: /blocks/closed_loop_support/request_detail.php?requestid=$requestid");

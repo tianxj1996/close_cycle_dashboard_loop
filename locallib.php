@@ -113,7 +113,7 @@ function block_closed_loop_support_get_new_requests_teacher_ids(int $userid, int
     }
 }
 
-function block_closed_loop_support_get_new_replies_ids(int $userid, int $courseid = -1){
+function block_closed_loop_support_get_new_replies_ids(int $userid, int $courseid = -1, int $student = 1){
     global $DB;
 
     $tableReply = 'block_closed_loop_reply';
