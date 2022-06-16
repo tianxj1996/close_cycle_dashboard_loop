@@ -478,7 +478,7 @@ class mod_hsuforum_renderer extends plugin_renderer_base {
         $forum = hsuforum_get_cm_forum($cm);
         if (!hsuforum_user_can_see_post($forum, $discussion, $post, null, $cm)) {
             // Return a message about why you cannot see the post
-            return "<div class='hsuforum-post-content-hidden'>".get_string('forumbodyhidden','hsuforum')."</div>";
+            //return "<div class='hsuforum-post-content-hidden'>".get_string('forumbodyhidden','hsuforum')."</div>";
         }
         if ($commands === false){
             $commands = array();
@@ -511,6 +511,8 @@ class mod_hsuforum_renderer extends plugin_renderer_base {
         $data->postflags      = implode(' ',$this->post_get_flags($post, $cm, $discussion->id, false));
         $data->depth          = $depth;
         $data->revealed       = false;
+        $data->firstTeacher   = isset($post->firstTeacher) ? $post->firstTeacher : false;
+        $data->firstStudent   = isset($post->firstStudent) ? $post->firstStudent : false;
 
         if ($forum->anonymous
                 && $postuser->id === $USER->id
@@ -679,14 +681,130 @@ HTML;
      */
     public function posts($cm, $discussion, $posts, $canreply = false) {
         global $USER;
+        global $DB;
 
         $items = '';
         $count = 0;
+        /*$sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+        if ($sort && count($posts) > 2) {
+            $tmp = $posts;
+            $firstKey = '';
+            foreach ($tmp as $key => $val) {
+                $firstKey = $key;
+                break;
+            }
+            unset($tmp[$firstKey]);
+            foreach ($posts as $key => $val) {
+                if ($key == $firstKey) {
+                    continue;
+                }
+                $maxInfo = $this->getMaxInfo($tmp, $sort);
+                if ($maxInfo) {
+                    if ($key != $maxInfo['key']) {
+                        $a = $posts[$key];
+                        $posts[$key] = $maxInfo['val'];
+                        $posts[$maxInfo['key']] = $a;
+                    }
+                    unset($tmp[$maxInfo['key']]);
+                }
+            }
+        }*/
         if (!empty($posts)) {
             if (!array_key_exists($discussion->firstpost, $posts)) {
                 throw new coding_exception('Missing discussion post');
             }
             $parent = $posts[$discussion->firstpost];
+            $getData = $_GET;
+            if (isset($getData['oriSort'])) {
+                if ($getData['oriSort'] == 0) {
+                    if (!$discussion->topping) {
+                        $discussion->topping = 1;
+                        $data = new stdClass;
+                        $data->topping = 1;
+                        $data->id = $discussion->id;
+                        $DB->update_record('hsuforum_discussions', $data);
+                    }
+                } else {
+                    if ($discussion->topping) {
+                        $discussion->topping = 0;
+                        $data = new stdClass;
+                        $data->topping = 0;
+                        $data->id = $discussion->id;
+                        $DB->update_record('hsuforum_discussions', $data);
+                    }
+                }
+            }
+            if (count($posts) > 2 && $discussion->topping) {
+                $maxTInfo = $this->getMaxInfo($posts, 'teacher');
+                $maxSInfo = $this->getMaxInfo($posts, 'student');
+                $teacherInfo = $maxTInfo['val'];
+                $aggregate1 = $maxTInfo['aggregate1'];
+                $maxKey = $maxTInfo['key'];
+                $studentInfo = $maxSInfo['val'];
+                $aggregate1Stu = $maxSInfo['aggregate1'];
+                $maxKeyStu = $maxSInfo['key'];
+                if ($aggregate1 > 0 && $aggregate1Stu > 0) {
+                    if ($maxKey == $maxKeyStu) {
+                        $info = $teacherInfo;
+                        $info->firstTeacher = true;
+                        $info->firstStudent = true;
+                        if (!empty($info->children)) {
+                            foreach ($info->children as $key => $val) {
+                                $posts[$key]->parent = $info->parent;
+                            }
+                            $info->children = null;
+                        }
+                        $info->parent = $parent->id;
+                        unset($posts[$maxKey]);
+                        $items .= $this->post_walker($cm, $discussion, [$info], $parent, $canreply, $count);
+                    } else {
+                        $teacherInfo->firstTeacher = true;
+                        if (!empty($teacherInfo->children)) {
+                            foreach ($teacherInfo->children as $key => $val) {
+                                $posts[$key]->parent = $teacherInfo->parent;
+                            }
+                            $teacherInfo->children = null;
+                        }
+                        $teacherInfo->parent = $parent->id;
+                        unset($posts[$maxKey]);
+                        $items .= $this->post_walker($cm, $discussion, [$teacherInfo], $parent, $canreply, $count);
+
+                        $studentInfo->firstStudent = true;
+                        if (!empty($studentInfo->children)) {
+                            foreach ($studentInfo->children as $key => $val) {
+                                $posts[$key]->parent = $studentInfo->parent;
+                            }
+                            $studentInfo->children = null;
+                        }
+                        $studentInfo->parent = $parent->id;
+                        unset($posts[$maxKeyStu]);
+                        $items .= $this->post_walker($cm, $discussion, [$studentInfo], $parent, $canreply, $count);
+                    }
+                } elseif ($aggregate1 > 0) {
+                    $teacherInfo->firstTeacher = true;
+                    if (!empty($teacherInfo->children)) {
+                        foreach ($teacherInfo->children as $key => $val) {
+                            $posts[$key]->parent = $teacherInfo->parent;
+                        }
+                        $teacherInfo->children = null;
+                    }
+                    $teacherInfo->parent = $parent->id;
+                    unset($posts[$maxKey]);
+                    $items .= $this->post_walker($cm, $discussion, [$teacherInfo], $parent, $canreply, $count);
+                } elseif ($aggregate1Stu > 0) {
+                    $studentInfo->firstStudent = true;
+                    if (!empty($studentInfo->children)) {
+                        foreach ($studentInfo->children as $key => $val) {
+                            $posts[$key]->parent = $studentInfo->parent;
+                        }
+                        $studentInfo->children = null;
+                    }
+                    $studentInfo->parent = $parent->id;
+                    unset($posts[$maxKeyStu]);
+                    $items .= $this->post_walker($cm, $discussion, [$studentInfo], $parent, $canreply, $count);
+                }
+            }
+
             $items .= $this->post_walker($cm, $discussion, $posts, $parent, $canreply, $count);
 
             // Mark post as read.
@@ -696,6 +814,19 @@ HTML;
             }
         }
         $output  = "<h5 role='heading' aria-level='5'>".hsuforum_xreplies($count)."</h5>";
+        $context = context_module::instance($cm->id);
+        if (has_capability('mod/hsuforum:editanypost', $context)) {
+            $output .= '<script>function goLink(url) {location.href=url;}</script>';
+            if (!$discussion->topping) {
+                $getData['oriSort'] = 0;
+                $url = new moodle_url('/mod/hsuforum/discuss.php', $getData);
+                $output .= "<a href='javascript:;' class='btn btn-primary' " . 'onclick="goLink(' . "'" . $url . "'" . ')">Recover top reply</a>';
+            } else {
+                $getData['oriSort'] = 1;
+                $url = new moodle_url('/mod/hsuforum/discuss.php', $getData);
+                $output .= "<a href='javascript:;' class='btn btn-danger' " . 'onclick="goLink(' . "'" . $url . "'" . ')">Cancel top reply</a>';
+            }
+        }
         if (!empty($count)) {
             $output .= "<ol class='hsuforum-thread-replies-list'>".$items."</ol>";
         }
@@ -732,6 +863,32 @@ HTML;
             }
         }
         return $output;
+    }
+
+    protected function getMaxInfo($items, $sort) {
+        if (empty($items)) {
+            return null;
+        }
+        $max_aggregate = -1;
+        $max_key = '1';
+        foreach ($items as $key => $val) {
+            $aggregate1 = 0;
+            $tmp = json_decode(json_encode($val), true);
+            if ($sort == 'teacher' && !empty($tmp['rating']['aggregate'])) {
+                $aggregate1 = $tmp['rating']['aggregate'];
+            } elseif ($sort == 'student' && !empty($tmp['rating_stu']['aggregate'])) {
+                $aggregate1 = $tmp['rating_stu']['aggregate'];
+            }
+            if ($aggregate1 > $max_aggregate) {
+                $max_aggregate = $aggregate1;
+                $max_key = $key;
+            }
+        }
+        return [
+            'key' => $max_key,
+            'val' => $items[$max_key],
+            'aggregate1' => $max_aggregate,
+        ];
     }
 
     /**
@@ -807,6 +964,14 @@ HTML;
             $nonanonymous = get_string('nonanonymous', 'mod_hsuforum');
             $revealed = '<span class="label label-danger">'.$nonanonymous.'</span>';
         }
+        $firstTeacher = '';
+        if ($p->firstTeacher) {
+            $firstTeacher = "<div style='color: #FFC000; font-size: 16px; font-weight: 600; float: left; margin-right: 10px;'>This is teachers’ best rating answer</div>";
+        }
+        $firstStudent = '';
+        if ($p->firstStudent) {
+            $firstStudent = "<div style='color: #FFC000; font-size: 16px; font-weight: 600;'>This is students’ best rating answer</div>";
+        }
 
  return <<<HTML
 <div class="hsuforum-post-wrapper hsuforum-post-target clearfix $unreadclass" id="p$p->id" data-postid="$p->id" data-discussionid="$p->discussionid" data-author="$author" data-ispost="true" tabindex="-1">
@@ -824,7 +989,7 @@ HTML;
 
         <div class="hsuforum-post-content">
             <div class="hsuforum-post-title">$p->subject</div>
-                $p->message
+                $firstTeacher $firstStudent <div style="clear: both;"></div> $p->message
         </div>
         <div role="region" class='hsuforum-tools' aria-label='$options'>
             <div class="hsuforum-postflagging">$p->postflags</div>
@@ -1287,13 +1452,20 @@ HTML;
      * @author Mark Nielsen
      */
     public function post_rating($post) {
-        $output = '';
+        $output = '<div>';
         if (!empty($post->rating)) {
             $rendered = $this->render($post->rating);
             if (!empty($rendered)) {
-                $output = "<div class='forum-post-rating'>".$rendered."</div>";
+                $output .= "<div class='forum-post-rating' style='float: left;margin-right: 10px;'>".$rendered."</div>";
             }
         }
+        if (!empty($post->rating_stu)) {
+            $rendered = $this->render($post->rating_stu);
+            if (!empty($rendered)) {
+                $output .= "<div class='forum-post-rating'>".$rendered."</div>";
+            }
+        }
+        $output .= '</div>';
         return $output;
     }
 

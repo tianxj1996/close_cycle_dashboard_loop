@@ -3642,7 +3642,7 @@ function hsuforum_rating_validate($params) {
     }
 
     // Check the ratingarea is post (the only rating area in forum)
-    if ($params['ratingarea'] != 'post') {
+    if ($params['ratingarea'] != 'post' && $params['ratingarea'] != 'post_stu') {
         throw new rating_exception('invalidratingarea');
     }
 
@@ -3783,12 +3783,12 @@ function mod_hsuforum_rating_can_see_item_ratings($params) {
     global $DB, $USER;
 
     // Check the component is mod_hsuforum.
-    if (!isset($params['component']) || $params['component'] != 'mod_hsuforum') {
+    if (!isset($params['component']) || ($params['component'] != 'mod_hsuforum' && $params['component'] != 'mod_hsuforum_stu')) {
         throw new rating_exception('invalidcomponent');
     }
 
     // Check the ratingarea is post (the only rating area in forum).
-    if (!isset($params['ratingarea']) || $params['ratingarea'] != 'post') {
+    if (!isset($params['ratingarea']) || ($params['ratingarea'] != 'post' && $params['ratingarea'] != 'post_stu')) {
         throw new rating_exception('invalidratingarea');
     }
 
