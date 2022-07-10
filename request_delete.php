@@ -22,4 +22,6 @@ if ($userid && $record->userid != $userid) {
     exit('you can not delete this request');
 }
 $DB->delete_records('block_closed_loop_support', ['id' => $requestid]);
+$DB->delete_records('block_closed_loop_reply', ['requestid' => $requestid]);
+$DB->delete_records('block_closed_loop_teacher', ['requestid' => $requestid]);
 header("Location: /blocks/closed_loop_support/request_overview.php?courseid=" . $record->courseid);
