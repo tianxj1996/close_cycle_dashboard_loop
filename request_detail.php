@@ -98,8 +98,10 @@ $context = context_course::instance($record->courseid);
 $teachers = get_role_users($role->id, $context);
 
 $tableReply = 'block_closed_loop_reply';
-$condition = ['requestid' => $requestid, 'userid' => $USER->id];
+$tableResponse = 'block_closed_loop_teacher';
+$condition = ['requestid' => $requestid->id, 'userid' => $USER->id];
 $DB->delete_records($tableReply, $condition);
+$DB->delete_records($tableResponse, $condition);
 /*if ($userid) {
     $condition = ['requestid' => $requestid, 'userid' => $USER->id];
     $DB->delete_records($tableReply, $condition);
