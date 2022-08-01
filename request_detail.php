@@ -99,7 +99,7 @@ $teachers = get_role_users($role->id, $context);
 
 $tableReply = 'block_closed_loop_reply';
 $tableResponse = 'block_closed_loop_teacher';
-$condition = ['requestid' => $requestid->id, 'userid' => $USER->id];
+$condition = ['requestid' => $requestid, 'userid' => $USER->id];
 $DB->delete_records($tableReply, $condition);
 $DB->delete_records($tableResponse, $condition);
 /*if ($userid) {
@@ -128,3 +128,4 @@ echo $OUTPUT->footer();
 $eventparams = array('courseid' => $courseid, 'userid' => $USER->id, 'contextid' => $context->id);
 $event = \block_closed_loop_support\event\course_requests_viewed::create($eventparams);
 $event->trigger();
+header("Location: /blocks/closed_loop_support/request_overview.php?courseid=" . $_SERVER['HTTP_REFERER']);
